@@ -1,0 +1,18 @@
+pre-commit:
+  commands:
+    check:
+      run: pnpm biome format --write {staged_files}
+      glob: "*.{js,ts,jsx,tsx,json}"
+      stage_fixed: true
+
+pre-push:
+  commands:
+    validate:
+      glob: "*.{ts,tsx}"
+      run: pnpm typecheck
+    lint:
+      glob: "*.{ts,tsx}"
+      run: pnpm biome lint {staged_files}
+    test:
+      glob: "*.{ts,tsx}"
+      run: pnpm test:coverage
