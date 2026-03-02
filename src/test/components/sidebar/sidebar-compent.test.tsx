@@ -47,6 +47,17 @@ const expectSidebarState = (isCollapsed: boolean) => {
 describe('Sidebar content', () => {
   const user = userEvent.setup()
 
+  beforeEach(() => {
+    mockSearchParams = new URLSearchParams()
+    pushMock.mockClear()
+  })
+
+  afterEach(async () => {
+    jest.clearAllMocks()
+    // Aguarda qualquer promise pendente
+    await new Promise((resolve) => setTimeout(resolve, 0))
+  })
+
   describe('Initial base', () => {
     it('should render a new prompt button', async () => {
       makeSut()

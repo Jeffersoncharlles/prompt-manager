@@ -1,19 +1,50 @@
+import { cva, type VariantProps } from 'class-variance-authority'
 import type * as React from 'react'
-
 import { cn } from '@/lib/utils'
 
-function Input({ className, type, ...props }: React.ComponentProps<'input'>) {
+const inputVariants = cva(
+  'group-data-[collapsed=true]:hidden h-11 w-full bg-neutral-700 border border-neutral-600 rounded-md p-3 text-white placeholder-neutral-400 focus:outline-none',
+  {
+    variants: {
+      variant: {
+        default:
+          'h-11 w-full bg-neutral-700 border border-neutral-600 rounded-md p-3 text-white placeholder-neutral-400 focus:outline-none',
+        transparent: 'bg-transparent text-white placeholder:text-[#424242]',
+      },
+      size: {
+        default: 'h-9',
+        sm: 'h-8',
+        lg: 'h-14 text-2xl font-bold sm:h-16 sm:text-3xl',
+      },
+      readOnly: {
+        true: 'focus:ring-0 focus:border-neutral-600 cursor-default',
+        false: 'focus:ring-2 focus:ring-accent-400 focus:border-transparent',
+      },
+    },
+    defaultVariants: {
+      variant: 'default',
+      size: 'default',
+      readOnly: false,
+    },
+  },
+)
+
+type InputProps = Omit<React.ComponentProps<'input'>, 'size'> &
+  VariantProps<typeof inputVariants>
+
+function Input({
+  variant,
+  size,
+  className,
+  type,
+  readOnly,
+  ...props
+}: InputProps) {
   return (
     <input
       type={type}
       data-slot="input"
-      className={cn(
-        'group-data-[collapsed=true]:hidden',
-        'file:text-foreground placeholder:text-muted-foreground selection:bg-primary selection:text-primary-foreground dark:bg-input/30 border-input h-9 w-full min-w-0 rounded-md border bg-transparent px-3 py-1 text-base shadow-xs transition-[color,box-shadow] outline-none file:inline-flex file:h-7 file:border-0 file:bg-transparent file:text-sm file:font-medium disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm',
-        'focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]',
-        'aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive',
-        className,
-      )}
+      className={cn(inputVariants({ variant, size, readOnly }), className)}
       {...props}
     />
   )

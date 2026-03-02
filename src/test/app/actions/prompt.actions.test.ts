@@ -160,5 +160,15 @@ describe('Server Actions - Prompt Actions', () => {
       expect(result.success).toBe(true)
       expect(result.prompts).toEqual(input)
     })
+    it('should return all prompts error', async () => {
+      mockedFindManyExecute.mockRejectedValue(
+        new Error('Erro ao buscar prompts.'),
+      )
+
+      const result = await getAllPrompts()
+
+      expect(result.success).toBe(false)
+      expect(result.msg).toBe('Erro ao buscar prompts.')
+    })
   })
 })

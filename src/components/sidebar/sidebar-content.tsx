@@ -2,7 +2,13 @@
 
 import { ArrowLeftToLine, ArrowRightToLine, Plus, X } from 'lucide-react'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { startTransition, useActionState, useRef, useState } from 'react'
+import {
+  startTransition,
+  useActionState,
+  useEffect,
+  useRef,
+  useState,
+} from 'react'
 import { searchPromptAction } from '@/app/actions/prompt.actions'
 import type { PromptSummary } from '@/core/domain/prompts/prompt.entity'
 import Logo from '../logo/logo'
@@ -53,6 +59,14 @@ export const SidebarContent = ({ prompts }: SidebarContentProps) => {
       formRef.current?.requestSubmit() //for digitando submit
     })
   }
+
+  useEffect(() => {
+    if (!hasQuery) {
+      return
+    }
+
+    formRef.current?.requestSubmit()
+  }, [hasQuery])
 
   return (
     <Sidebar.Root data-collapsed={isCollapsed}>

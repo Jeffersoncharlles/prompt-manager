@@ -1,3 +1,5 @@
+import { PromptForm } from '@/components/prompts/prompt-form'
+
 export default function NewPromptPage() {
-  return <div>Novo Prompt</div>
+  return <PromptForm />
 }
