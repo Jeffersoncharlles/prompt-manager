@@ -1,10 +1,15 @@
-import { getPrompts } from '@/http/get-promps'
+import { getAllPrompts } from '@/app/actions/prompt.actions'
 import { SidebarContent } from './sidebar/sidebar-content'
 
 export const SidebarComponent = async () => {
-  const prompts = await getPrompts()
+  // const [promptsState, setPromptsState] = useActionState(getAllPrompts, {
+  //   success: true,
+  //   prompts: [],
+  // })
 
-  return <SidebarContent prompts={prompts} />
+  const promptsState = await getAllPrompts()
+
+  return <SidebarContent prompts={promptsState.prompts} />
 }
 
 export default SidebarComponent

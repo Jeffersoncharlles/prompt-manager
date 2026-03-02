@@ -19,6 +19,7 @@ export type SidebarContentProps = {
 export const SidebarContent = ({ prompts }: SidebarContentProps) => {
   const formRef = useRef<HTMLFormElement | null>(null)
   const searchParams = useSearchParams()
+
   const [searchFormState, setSearchFormState, isPending] = useActionState(
     searchPromptAction,
     {
@@ -32,7 +33,6 @@ export const SidebarContent = ({ prompts }: SidebarContentProps) => {
   const promptList = hasQuery ? (searchFormState.prompts ?? prompts) : prompts
 
   const [isCollapsed, setIsCollapsed] = useState(false)
-
   const collapseSidebar = () => setIsCollapsed(true)
 
   const expandSidebar = () => {
