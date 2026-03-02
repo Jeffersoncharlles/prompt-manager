@@ -4,7 +4,7 @@ import { SidebarContent } from './sidebar/sidebar-content'
 export const SidebarComponent = async () => {
   const prompts = await getPrompts()
 
-  return <SidebarContent />
+  return <SidebarContent prompts={prompts} />
 }
 
 export default SidebarComponent

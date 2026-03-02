@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import './globals.css'
-import Sidebar, { SidebarComponent } from '@/components/sidebar-componet'
+import { SidebarComponent } from '@/components/sidebar-component'
 
 export const metadata: Metadata = {
   title: {
@@ -28,8 +28,8 @@ export default function RootLayout({
         className={`${inter.className} bg-neutral-900 text-white antialiased`}
       >
         <section className="flex h-screen">
+          <SidebarComponent />
           <main className="relative flex-1 overflow-auto min-w-0">
-            <SidebarComponent />
             <div className="p-4 sm:p-6 md:p-8 max-w-full md:max-w-3xl mx-auto h-full">
               {children}
             </div>
