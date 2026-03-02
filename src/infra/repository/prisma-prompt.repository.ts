@@ -6,7 +6,11 @@ export class PrismaPromptRepository implements PromptRepository {
   constructor(private prisma: PrismaClient) {}
 
   async findMany(): Promise<PromptSummary[]> {
-    const prompts = await this.prisma.prompt.findMany()
+    const prompts = await this.prisma.prompt.findMany({
+      orderBy: {
+        createdAt: 'desc',
+      },
+    })
 
     return prompts
   }

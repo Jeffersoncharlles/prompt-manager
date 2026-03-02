@@ -1,4 +1,4 @@
-import { searchPromptAction } from '@/app/actions/prompt.actions'
+import { getAllPrompts, searchPromptAction } from '@/app/actions/prompt.actions'
 
 // Mock prisma to avoid TextEncoder error in JSDOM
 jest.mock('@/lib/prisma', () => ({
@@ -6,6 +6,7 @@ jest.mock('@/lib/prisma', () => ({
 }))
 
 const mockedSearchExecute = jest.fn()
+const mockedFindManyExecute = jest.fn()
 
 jest.mock('@/infra/repository/prisma-prompt.repository', () => ({
   PrismaPromptRepository: jest.fn().mockImplementation(() => ({})),
@@ -14,6 +15,11 @@ jest.mock('@/infra/repository/prisma-prompt.repository', () => ({
 jest.mock('@/core/application/prompts/search-prompts.use-case', () => ({
   SearchPromptsUseCase: jest.fn().mockImplementation(() => ({
     execute: mockedSearchExecute,
+  })),
+}))
+jest.mock('@/core/application/prompts/get-all-prompts.use-case', () => ({
+  GetAllPromptsUseCase: jest.fn().mockImplementation(() => ({
+    execute: mockedFindManyExecute,
   })),
 }))
 
@@ -128,6 +134,29 @@ describe('Server Actions - Prompt Actions', () => {
       const result = await searchPromptAction({ success: true }, formData)
 
       expect(mockedSearchExecute).toHaveBeenCalledWith('')
+      expect(result.success).toBe(true)
+      expect(result.prompts).toEqual(input)
+    })
+  })
+
+  describe('getAllPromptsAction', () => {
+    it('should return all prompts', async () => {
+      const input = [
+        {
+          id: '01',
+          title: 'Example Prompt',
+          content: 'This is an example prompt.',
+        },
+        {
+          id: '02',
+          title: 'Another Example Prompt',
+          content: 'This is another example prompt.',
+        },
+      ]
+      mockedFindManyExecute.mockResolvedValue(input)
+
+      const result = await getAllPrompts()
+
       expect(result.success).toBe(true)
       expect(result.prompts).toEqual(input)
     })
