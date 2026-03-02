@@ -2,27 +2,34 @@
 
 import { ArrowLeftToLine, ArrowRightToLine, Plus, X } from 'lucide-react'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { startTransition, useState } from 'react'
-
+import { startTransition, useActionState, useRef, useState } from 'react'
+import { searchPromptAction } from '@/app/actions/prompt.actions'
+import type { PromptSummary } from '@/core/domain/prompts/prompt.entity'
 import Logo from '../logo/logo'
+import { PromptList } from '../prompts/prompt-list'
 import { Button } from '../ui/button'
 import { Input } from '../ui/input'
 import { Sidebar } from '../ui/sidebar'
-
-type Prompts = {
-  id: string
-  title: string
-  content: string
-}
+import { Spinner } from '../ui/spinner'
 
 export type SidebarContentProps = {
-  prompts: Prompts[]
+  prompts: PromptSummary[]
 }
 
 export const SidebarContent = ({ prompts }: SidebarContentProps) => {
+  const formRef = useRef<HTMLFormElement | null>(null)
   const searchParams = useSearchParams()
+  const [searchFormState, setSearchFormState, isPending] = useActionState(
+    searchPromptAction,
+    {
+      success: true,
+      prompts,
+    },
+  )
   const router = useRouter()
   const [query, setQuery] = useState(searchParams.get('q') || '')
+  const hasQuery = query.trim().length > 0
+  const promptList = hasQuery ? (searchFormState.prompts ?? prompts) : prompts
 
   const [isCollapsed, setIsCollapsed] = useState(false)
 
@@ -43,6 +50,7 @@ export const SidebarContent = ({ prompts }: SidebarContentProps) => {
       const url = newQuery ? `/?q=${encodeURIComponent(newQuery)}` : '/'
 
       router.push(url, { scroll: false })
+      formRef.current?.requestSubmit() //for digitando submit
     })
   }
 
@@ -76,8 +84,12 @@ export const SidebarContent = ({ prompts }: SidebarContentProps) => {
             </Button>
           </Sidebar.Header>
         </div>
-        <section className="mb-5">
-          <form>
+        <section className="mb-5 ">
+          <form
+            ref={formRef}
+            action={setSearchFormState}
+            className="relative group w-full"
+          >
             <Input
               type="text"
               name="q"
@@ -86,14 +98,25 @@ export const SidebarContent = ({ prompts }: SidebarContentProps) => {
               onChange={handleQueryChange}
               autoFocus
             />
+            {isPending && (
+              <div
+                title="carregando prompts"
+                className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-2"
+              >
+                <Spinner />
+                {/* <span className="text-sm text-neutral-500">Buscando...</span> */}
+              </div>
+            )}
           </form>
         </section>
-        <div className="">
-          <Button onClick={handleNewPrompt} className="w-full" size="lg">
-            <Plus className="size-5 text-neutral-100 mr-2" />
-            Novo Prompt
-          </Button>
-        </div>
+        {!isCollapsed && (
+          <div>
+            <Button onClick={handleNewPrompt} className="w-full" size="lg">
+              <Plus className="size-5 text-neutral-100 mr-2" />
+              Novo Prompt
+            </Button>
+          </div>
+        )}
       </Sidebar.Section>
 
       {/* expand aside */}
@@ -109,16 +132,28 @@ export const SidebarContent = ({ prompts }: SidebarContentProps) => {
         >
           <ArrowRightToLine className="size-5 text-neutral-100" />
         </Button>
+        {isCollapsed && (
+          <div className="group-data-[collapsed=true]:block group-data-[collapsed=false]:hidden flex items-center ">
+            <Button
+              onClick={handleNewPrompt}
+              title="Novo Prompt"
+              aria-label="Novo prompt"
+              className="cursor-pointer"
+            >
+              <Plus className="size-5 text-neutral-100 " />
+            </Button>
+          </div>
+        )}
       </Sidebar.SectionExpand>
 
-      {prompts.map((prompt) => (
-        <div
-          key={prompt.id}
-          className="p-4 rounded-md hover:bg-neutral-700 cursor-pointer"
+      {!isCollapsed && (
+        <Sidebar.SectionNav
+          aria-label="Lista de prompts"
+          title="Lista de prompts"
         >
-          {prompt.title}
-        </div>
-      ))}
+          <PromptList prompts={promptList} />
+        </Sidebar.SectionNav>
+      )}
     </Sidebar.Root>
   )
 }

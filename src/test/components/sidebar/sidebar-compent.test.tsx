@@ -41,7 +41,9 @@ describe('Sidebar content', () => {
   describe('Initial base', () => {
     it('should render a new prompt button', async () => {
       makeSut()
-      expect(screen.getByRole('button', { name: /Novo Prompt/i })).toBeVisible()
+      expect(
+        screen.getByRole('button', { name: /^Novo Prompt$/i }),
+      ).toBeVisible()
     })
 
     it('should render the list prompts', async () => {
@@ -127,6 +129,31 @@ describe('Sidebar content', () => {
       //  verifica mudança de estado
       expectSidebarState(false)
     })
+
+    it('should Display the "Create a new prompt" button in the minimized sidebar.', async () => {
+      makeSut()
+      const collapseButton = screen.getByRole('button', {
+        name: /Minimizar menu/i,
+      })
+      await user.click(collapseButton)
+
+      const newPromptButton = screen.getByRole('button', {
+        name: /^Novo prompt$/i,
+      })
+      expect(newPromptButton).toBeVisible()
+    })
+    it('should not The list of prompts  be displayed in the minimized sidebar.', async () => {
+      makeSut()
+      const collapseButton = screen.getByRole('button', {
+        name: /Minimizar menu/i,
+      })
+      await user.click(collapseButton)
+
+      const promptList = screen.queryByRole('navigation', {
+        name: /Lista de prompts/i,
+      })
+      expect(promptList).not.toBeInTheDocument()
+    })
   })
   /*----------------------------*/
   describe('New Prompt button', () => {
@@ -134,7 +161,7 @@ describe('Sidebar content', () => {
       makeSut()
 
       const newPromptButton = screen.getByRole('button', {
-        name: /Novo Prompt/i,
+        name: /^Novo prompt$/i,
       })
       await user.click(newPromptButton)
 

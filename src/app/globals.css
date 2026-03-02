@@ -112,3 +112,37 @@ body {
     @apply bg-background text-foreground;
     }
 }
+
+/* Custom Scrollbar */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-neutral-600) var(--color-neutral-900);
+}
+
+*::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+}
+
+*::-webkit-scrollbar-track {
+  background: var(--color-neutral-900);
+  border-radius: 8px;
+}
+
+*::-webkit-scrollbar-thumb {
+  background: var(--color-neutral-600);
+  border-radius: 8px;
+  border: 2px solid var(--color-neutral-900);
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background: var(--color-neutral-500);
+}
+
+*::-webkit-scrollbar-thumb:active {
+  background: var(--color-neutral-400);
+}
+
+*::-webkit-scrollbar-corner {
+  background: var(--color-neutral-900);
+}

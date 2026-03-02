@@ -25,16 +25,14 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${inter.className} bg-neutral-900 text-white antialiased`}
+        className={`${inter.className} bg-neutral-900 text-white antialiased flex h-screen`}
       >
-        <section className="flex h-screen">
-          <SidebarComponent />
-          <main className="relative flex-1 overflow-auto min-w-0">
-            <div className="p-4 sm:p-6 md:p-8 max-w-full md:max-w-3xl mx-auto h-full">
-              {children}
-            </div>
-          </main>
-        </section>
+        <SidebarComponent />
+        <main className="relative flex-1 overflow-auto min-w-0">
+          <div className="p-4 sm:p-6 md:p-8 max-w-full md:max-w-3xl mx-auto h-full">
+            {children}
+          </div>
+        </main>
       </body>
     </html>
   )

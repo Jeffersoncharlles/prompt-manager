@@ -1,10 +1,6 @@
 import type { ComponentProps } from 'react'
 import { twMerge } from 'tailwind-merge'
 
-// const SibarRottVarient = cva(
-
-// )
-
 interface SidebarRootProps extends ComponentProps<'aside'> {}
 const SidebarRoot = ({ className, ...props }: SidebarRootProps) => {
   return (
@@ -79,9 +75,24 @@ const SidebarSectionExpand = ({
     <section
       className={twMerge(
         'hidden md:flex h-full items-start justify-center p-3 group-data-[collapsed=false]:hidden',
+        'group-data-[collapsed=true]:flex group-data-[collapsed=true]:justify-start group-data-[collapsed=true]:flex-col',
+        'group-data-[collapsed=true]:space-y-4 group-data-[collapsed=true]:items-center',
         'transition-[transform,width] duration-300 delay-100 ease-in-out',
         // Esse ícone só aparece (fade in) quando a sidebar ESTÁ colapsada
         'group-data-[collapsed=false]:opacity-0 group-data-[collapsed=false]:invisible',
+        className,
+      )}
+      {...props}
+    />
+  )
+}
+interface SidebarSectionNavProps extends ComponentProps<'nav'> {}
+const SidebarSectionNav = ({ className, ...props }: SidebarSectionNavProps) => {
+  return (
+    <nav
+      className={twMerge(
+        'group-data-[collapsed=true]:hidden group-data-[collapsed=false]:block',
+        'flex-1 overflow-auto px-6 pb-6',
         className,
       )}
       {...props}
@@ -95,4 +106,5 @@ export const Sidebar = {
   Menu: SidebarMenu,
   Section: SidebarSection,
   SectionExpand: SidebarSectionExpand,
+  SectionNav: SidebarSectionNav,
 }
