@@ -59,6 +59,9 @@ describe('SearchPromptsUseCase', () => {
     const repository: PromptRepository = {
       findMany,
       searchMany,
+      create: jest.fn(),
+      findByTitle: jest.fn(),
+      findById: jest.fn(),
     }
 
     const useCase = new SearchPromptsUseCase(repository)
