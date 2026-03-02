@@ -1,4 +1,8 @@
-import { getAllPrompts, searchPromptAction } from '@/app/actions/prompt.actions'
+import {
+  createPromptAction,
+  getAllPrompts,
+  searchPromptAction,
+} from '@/app/actions/prompt.actions'
 
 // Mock prisma to avoid TextEncoder error in JSDOM
 jest.mock('@/lib/prisma', () => ({
@@ -7,6 +11,7 @@ jest.mock('@/lib/prisma', () => ({
 
 const mockedSearchExecute = jest.fn()
 const mockedFindManyExecute = jest.fn()
+const mockedCreateExecute = jest.fn()
 
 jest.mock('@/infra/repository/prisma-prompt.repository', () => ({
   PrismaPromptRepository: jest.fn().mockImplementation(() => ({})),
@@ -20,6 +25,11 @@ jest.mock('@/core/application/prompts/search-prompts.use-case', () => ({
 jest.mock('@/core/application/prompts/get-all-prompts.use-case', () => ({
   GetAllPromptsUseCase: jest.fn().mockImplementation(() => ({
     execute: mockedFindManyExecute,
+  })),
+}))
+jest.mock('@/core/application/prompts/create-prompt.use-case', () => ({
+  CreatePromptUseCase: jest.fn().mockImplementation(() => ({
+    execute: mockedCreateExecute,
   })),
 }))
 
@@ -169,6 +179,39 @@ describe('Server Actions - Prompt Actions', () => {
 
       expect(result.success).toBe(false)
       expect(result.msg).toBe('Erro ao buscar prompts.')
+    })
+  })
+
+  describe('createPromptAction', () => {
+    it('should return an error message if the data is invalid', async () => {
+      const data = {
+        title: '',
+        content: '',
+      }
+      const result = await createPromptAction(data)
+      expect(result.success).toBe(false)
+      expect(result.msg).toBe('Dados inválidos.')
+      expect(result.errors).toBeDefined()
+    })
+    it('should create a prompt successfully', async () => {
+      const data = {
+        title: 'Test Prompt',
+        content: 'This is a test prompt.',
+      }
+      const result = await createPromptAction(data)
+      expect(result.success).toBe(true)
+    })
+    it('should return an error message if the prompt already exists', async () => {
+      const data = {
+        title: 'Test Prompt',
+        content: 'This is a test prompt.',
+      }
+      mockedCreateExecute.mockRejectedValue(
+        new Error('Prompt_with_this_title_already_exists.'),
+      )
+      const result = await createPromptAction(data)
+      expect(result.success).toBe(false)
+      expect(result.msg).toBe('Já existe um prompt com este título.')
     })
   })
 })

@@ -32,6 +32,9 @@ describe('GetAllPromptsUseCase', () => {
             .toLocaleLowerCase()
             .includes(query.toLocaleLowerCase()),
       ),
+    create: jest.fn(),
+    findByTitle: jest.fn(),
+    findById: jest.fn(),
   }
 
   it('should return get all prompts', async () => {

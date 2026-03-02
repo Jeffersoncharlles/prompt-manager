@@ -1,5 +1,11 @@
 'use server'
 
+import z from 'zod'
+import {
+  type CreatePromptDto,
+  createPromptSchema,
+} from '@/core/application/prompts/create-prompt.dto'
+import { CreatePromptUseCase } from '@/core/application/prompts/create-prompt.use-case'
 import { GetAllPromptsUseCase } from '@/core/application/prompts/get-all-prompts.use-case'
 import { SearchPromptsUseCase } from '@/core/application/prompts/search-prompts.use-case'
 import type { PromptSummary } from '@/core/domain/prompts/prompt.entity'
@@ -63,6 +69,49 @@ export const getAllPrompts = async (): Promise<GetAllPromptsState> => {
       success: false,
       prompts: [],
       msg: 'Erro ao buscar prompts.',
+    }
+  }
+}
+
+type CreatePromptState = {
+  success: boolean
+  msg?: string
+  errors?: Record<string, string[]>
+}
+
+export const createPromptAction = async (
+  data: CreatePromptDto,
+): Promise<CreatePromptState> => {
+  const validated = createPromptSchema.safeParse(data)
+
+  if (!validated.success) {
+    const { fieldErrors } = z.flattenError(validated.error)
+    return {
+      success: false,
+      msg: 'Dados inválidos.',
+      errors: fieldErrors,
+    }
+  }
+
+  try {
+    const repository = new PrismaPromptRepository(prisma)
+    const useCase = new CreatePromptUseCase(repository)
+    await useCase.execute(validated.data)
+
+    return {
+      success: true,
+    }
+  } catch (error) {
+    const _error = error as Error
+    if (_error.message === 'Prompt_with_this_title_already_exists.') {
+      return {
+        success: false,
+        msg: 'Já existe um prompt com este título.',
+      }
+    }
+    return {
+      success: false,
+      msg: 'Ocorreu um erro ao criar o prompt.',
     }
   }
 }

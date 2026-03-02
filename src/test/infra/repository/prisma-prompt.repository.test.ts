@@ -4,6 +4,7 @@ function createMockPrisma() {
   const mock = {
     prompt: {
       findMany: jest.fn(),
+      create: jest.fn(),
     },
   }
   return mock
@@ -75,6 +76,34 @@ describe('PrismaPromptRepository', () => {
         },
         orderBy: {
           createdAt: 'desc',
+        },
+      })
+      expect(result).toMatchObject(input)
+    })
+  })
+
+  describe('create', () => {
+    it('should create a new prompt', async () => {
+      const now = new Date()
+      const input = {
+        id: '1',
+        title: 'New Prompt',
+        content: 'New Content',
+        createdAt: now,
+        updatedAt: now,
+      }
+
+      prisma.prompt.create.mockResolvedValue(input)
+
+      const result = await repository.create({
+        title: 'New Prompt',
+        content: 'New Content',
+      })
+
+      expect(prisma.prompt.create).toHaveBeenCalledWith({
+        data: {
+          title: 'New Prompt',
+          content: 'New Content',
         },
       })
       expect(result).toMatchObject(input)
