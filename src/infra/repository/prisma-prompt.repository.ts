@@ -38,10 +38,15 @@ export class PrismaPromptRepository implements PromptRepository {
       updateAt: prompt.updatedAt,
     }
   }
-  async create(data: CreatePromptDto): Promise<void> {
-    await this.prisma.prompt.create({
+  async create(data: CreatePromptDto): Promise<Prompts> {
+    const prompt = await this.prisma.prompt.create({
       data,
     })
+    return {
+      ...prompt,
+      createAt: prompt.createdAt,
+      updateAt: prompt.updatedAt,
+    }
   }
 
   async findMany(): Promise<PromptSummary[]> {

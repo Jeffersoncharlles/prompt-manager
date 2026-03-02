@@ -10,6 +10,6 @@ export class CreatePromptUseCase {
       throw new Error('Prompt_with_this_title_already_exists.')
     }
 
-    await this.promptRepository.create(data)
+    return await this.promptRepository.create(data)
   }
 }
