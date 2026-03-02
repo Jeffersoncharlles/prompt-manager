@@ -1,31 +1,47 @@
 import type { CreatePromptDto } from '@/core/application/prompts/create-prompt.dto'
-import type { PromptSummary } from '@/core/domain/prompts/prompt.entity'
+import type {
+  PromptSummary,
+  Prompts,
+} from '@/core/domain/prompts/prompt.entity'
 import type { PromptRepository } from '@/core/domain/prompts/prompt.repository'
 import type { PrismaClient } from '@/generated/prisma/client'
 
 export class PrismaPromptRepository implements PromptRepository {
   constructor(private prisma: PrismaClient) {}
-  findByTitle(title: string): Promise<PromptSummary | null> {
-    const prompt = this.prisma.prompt.findFirst({
+  async findByTitle(title: string): Promise<Prompts | null> {
+    const prompt = await this.prisma.prompt.findFirst({
       where: {
         title,
       },
     })
-    return prompt
+    if (!prompt) {
+      return null
+    }
+    return {
+      ...prompt,
+      createAt: prompt.createdAt,
+      updateAt: prompt.updatedAt,
+    }
   }
-  findById(id: string): Promise<PromptSummary | null> {
-    const prompt = this.prisma.prompt.findUnique({
+  async findById(id: string): Promise<Prompts | null> {
+    const prompt = await this.prisma.prompt.findUnique({
       where: {
         id,
       },
     })
-    return prompt
+    if (!prompt) {
+      return null
+    }
+    return {
+      ...prompt,
+      createAt: prompt.createdAt,
+      updateAt: prompt.updatedAt,
+    }
   }
-  async create(data: CreatePromptDto): Promise<PromptSummary> {
-    const prompt = await this.prisma.prompt.create({
+  async create(data: CreatePromptDto): Promise<void> {
+    await this.prisma.prompt.create({
       data,
     })
-    return prompt
   }
 
   async findMany(): Promise<PromptSummary[]> {
