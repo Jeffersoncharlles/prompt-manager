@@ -32,6 +32,9 @@ describe('SearchPromptsUseCase', () => {
             .toLocaleLowerCase()
             .includes(query.toLocaleLowerCase()),
       ),
+    create: jest.fn(),
+    findByTitle: jest.fn(),
+    findById: jest.fn(),
   }
 
   it('should return prompts when the search term is empty', async () => {
