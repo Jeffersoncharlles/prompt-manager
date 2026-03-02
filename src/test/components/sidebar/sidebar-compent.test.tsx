@@ -5,6 +5,15 @@ import {
 } from '@/components/sidebar/sidebar-content'
 import { render, screen } from '@/lib/test-util'
 
+// Mock prisma to avoid TextEncoder error in JSDOM
+jest.mock('@/lib/prisma', () => ({
+  prisma: {
+    prompt: {
+      findMany: jest.fn().mockResolvedValue([]),
+    },
+  },
+}))
+
 const pushMock = jest.fn()
 let mockSearchParams = new URLSearchParams()
 
