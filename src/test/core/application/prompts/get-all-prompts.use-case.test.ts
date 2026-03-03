@@ -8,15 +8,15 @@ describe('GetAllPromptsUseCase', () => {
       id: '01',
       title: 'Example Prompt',
       content: 'This is an example prompt.',
-      createAt: new Date(),
-      updateAt: new Date(),
+      createdAt: new Date(),
+      updatedAt: new Date(),
     },
     {
       id: '02',
       title: 'Different Prompt',
       content: 'This is a different prompt with other content.',
-      createAt: new Date(),
-      updateAt: new Date(),
+      createdAt: new Date(),
+      updatedAt: new Date(),
     },
   ]
 
