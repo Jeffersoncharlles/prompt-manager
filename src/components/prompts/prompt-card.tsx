@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import type { PromptSummary } from '@/core/domain/prompts/prompt.entity'
 
-type PromptCardProps = {
+export type PromptCardProps = {
   prompt: PromptSummary
 }
 
@@ -13,6 +13,7 @@ export const PromptCard = ({ prompt }: PromptCardProps) => {
           href={`/prompts/${prompt.id}`}
           prefetch
           className="flex-1 min-w-0"
+          title={prompt.title}
         >
           <h3 className="font-medium text-sm text-white group-hover:text-accent-300 transition-colors">
             {prompt.title}

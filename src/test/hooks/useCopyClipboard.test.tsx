@@ -12,7 +12,9 @@ describe('useCopyToClipboard', () => {
   })
 
   afterEach(() => {
-    jest.runOnlyPendingTimers()
+    act(() => {
+      jest.runOnlyPendingTimers()
+    })
     jest.useRealTimers()
     jest.clearAllMocks()
   })
@@ -87,7 +89,6 @@ describe('useCopyToClipboard', () => {
     })
 
     expect(result.current.isCopied).toBe(true)
-
     act(() => {
       jest.advanceTimersByTime(2000)
     })

@@ -1,6 +1,8 @@
 import userEvent from '@testing-library/user-event'
+import type { ComponentProps } from 'react'
 import { toast } from 'sonner'
 import { CopyButton } from '@/components/button-actions/copy-button'
+import { useCopyToClipboard } from '@/hooks/useCopyToClipboard'
 import { render, screen, waitFor } from '@/lib/test-util'
 
 jest.mock('sonner', () => ({
@@ -21,7 +23,7 @@ jest.mock('@/hooks/useCopyToClipboard', () => ({
         | undefined,
     ) => ({
       isCopied: false,
-      copyToClipboard: (text: string) => {
+      copyToClipboard: async (text: string) => {
         try {
           if (text.trim()) {
             options?.onSuccess?.(text.trim())
@@ -33,6 +35,26 @@ jest.mock('@/hooks/useCopyToClipboard', () => ({
     }),
   ),
 }))
+
+type CopyButtonTestProps = ComponentProps<typeof CopyButton>
+
+const mockedUseCopyToClipboard = useCopyToClipboard as jest.MockedFunction<
+  typeof useCopyToClipboard
+>
+
+const makeSut = (props: Partial<CopyButtonTestProps> = {}) => {
+  const mergedProps: CopyButtonTestProps = {
+    content: 'Test content',
+    ...props,
+  }
+
+  const view = render(<CopyButton {...mergedProps} />)
+
+  return {
+    ...view,
+    content: mergedProps.content,
+  }
+}
 
 describe('copy button', () => {
   const user = userEvent.setup({ delay: null })
@@ -46,8 +68,7 @@ describe('copy button', () => {
   })
 
   it('should copy content to clipboard and show success toast', async () => {
-    const content = 'This is a test content.'
-    render(<CopyButton content={content} />)
+    makeSut({ content: 'This is a test content.' })
     const copyButton = screen.getByText(/copiar/i)
 
     await user.click(copyButton)
@@ -58,10 +79,9 @@ describe('copy button', () => {
   })
 
   it('should show error toast when clipboard fails', async () => {
-    const { useCopyToClipboard } = require('@/hooks/useCopyToClipboard')
     const mockError = new Error('Clipboard not available')
 
-    useCopyToClipboard.mockImplementationOnce(
+    mockedUseCopyToClipboard.mockImplementationOnce(
       (
         options:
           | {
@@ -71,14 +91,13 @@ describe('copy button', () => {
           | undefined,
       ) => ({
         isCopied: false,
-        copyToClipboard: () => {
+        copyToClipboard: async (_text?: string) => {
           options?.onError?.(mockError)
         },
       }),
     )
 
-    const content = 'This should fail.'
-    render(<CopyButton content={content} />)
+    makeSut({ content: 'This should fail.' })
     const copyButton = screen.getByText(/copiar/i)
 
     await user.click(copyButton)
@@ -91,23 +110,21 @@ describe('copy button', () => {
   })
 
   it('should disable button when content is empty', () => {
-    const { getByRole } = render(<CopyButton content="   " />)
+    const { getByRole } = makeSut({ content: '   ' })
     const button = getByRole('button')
 
     expect(button).toBeDisabled()
   })
 
   it('should call copyToClipboard with correct content', async () => {
-    const { useCopyToClipboard } = require('@/hooks/useCopyToClipboard')
     const mockCopyToClipboard = jest.fn()
 
-    useCopyToClipboard.mockImplementationOnce(() => ({
+    mockedUseCopyToClipboard.mockImplementationOnce(() => ({
       isCopied: false,
       copyToClipboard: mockCopyToClipboard,
     }))
 
-    const content = 'Test content for copy'
-    render(<CopyButton content={content} />)
+    const { content } = makeSut({ content: 'Test content for copy' })
     const copyButton = screen.getByText(/copiar/i)
 
     await user.click(copyButton)
@@ -116,36 +133,29 @@ describe('copy button', () => {
   })
 
   it('should display check icon and copiado text when isCopied is true', () => {
-    const { useCopyToClipboard } = require('@/hooks/useCopyToClipboard')
-
-    useCopyToClipboard.mockImplementationOnce(() => ({
+    mockedUseCopyToClipboard.mockImplementationOnce(() => ({
       isCopied: true,
       copyToClipboard: jest.fn(),
     }))
 
-    const content = 'Test content'
-    render(<CopyButton content={content} />)
+    makeSut({ content: 'Test content' })
 
     expect(screen.getByText('Copiado')).toBeInTheDocument()
   })
 
   it('should display copy icon and copiar text when isCopied is false', () => {
-    const { useCopyToClipboard } = require('@/hooks/useCopyToClipboard')
-
-    useCopyToClipboard.mockImplementationOnce(() => ({
+    mockedUseCopyToClipboard.mockImplementationOnce(() => ({
       isCopied: false,
       copyToClipboard: jest.fn(),
     }))
 
-    const content = 'Test content'
-    render(<CopyButton content={content} />)
+    makeSut({ content: 'Test content' })
 
     expect(screen.getByText('Copiar')).toBeInTheDocument()
   })
 
   it('should not be disabled when content has valid text', () => {
-    const content = 'Valid content'
-    const { getByRole } = render(<CopyButton content={content} />)
+    const { getByRole } = makeSut({ content: 'Valid content' })
     const button = getByRole('button')
 
     expect(button).not.toBeDisabled()

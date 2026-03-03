@@ -3,7 +3,16 @@ import {
   SidebarContent,
   type SidebarContentProps,
 } from '@/components/sidebar/sidebar-content'
-import { render, screen } from '@/lib/test-util'
+import { render, screen, waitFor } from '@/lib/test-util'
+
+const mockedSearchPromptAction = jest.fn().mockResolvedValue({
+  success: true,
+  prompts: [],
+})
+
+jest.mock('@/app/actions/prompt.actions', () => ({
+  searchPromptAction: (...args: unknown[]) => mockedSearchPromptAction(...args),
+}))
 
 // Mock prisma to avoid TextEncoder error in JSDOM
 jest.mock('@/lib/prisma', () => ({
@@ -50,12 +59,11 @@ describe('Sidebar content', () => {
   beforeEach(() => {
     mockSearchParams = new URLSearchParams()
     pushMock.mockClear()
+    mockedSearchPromptAction.mockClear()
   })
 
   afterEach(async () => {
     jest.clearAllMocks()
-    // Aguarda qualquer promise pendente
-    await new Promise((resolve) => setTimeout(resolve, 0))
   })
 
   describe('Initial base', () => {
@@ -74,22 +82,17 @@ describe('Sidebar content', () => {
       makeSut({ prompts: input })
 
       expect(screen.getByText(input[0].title)).toBeInTheDocument()
-      // expect(screen.getAllByRole('document')).toHaveLength(input.length)
     })
     it('should update the search results when prompts are added', async () => {
       makeSut()
       const searchInput = screen.getByPlaceholderText(/buscar prompts.../i)
 
       await user.type(searchInput, 'Prompt 1')
+      await waitFor(() => {
+        expect(mockedSearchPromptAction).toHaveBeenCalled()
+      })
 
       expect(searchInput).toHaveValue('Prompt 1')
-
-      // expectSidebarState(false)
-
-      // const collapseSearchInput =
-      //   screen.getByPlaceholderText('Buscar prompts...')
-
-      // expect(collapseSearchInput).toBeInTheDocument()
     })
   })
 
@@ -195,6 +198,9 @@ describe('Sidebar content', () => {
       const searchInput = screen.getByPlaceholderText(/buscar prompts.../i)
 
       await user.type(searchInput, 'Prompt 1')
+      await waitFor(() => {
+        expect(mockedSearchPromptAction).toHaveBeenCalled()
+      })
 
       expect(pushMock).toHaveBeenCalled()
 
@@ -210,26 +216,15 @@ describe('Sidebar content', () => {
 
     it('should start the search field with the search parameters.', async () => {
       const text = 'prompt1'
-      // Simula a navegação para a URL com o parâmetro de busca
       const url = new URLSearchParams(`q=${text}`)
       mockSearchParams = url
       makeSut()
       const searchInput = screen.getByPlaceholderText(/buscar prompts.../i)
+      await waitFor(() => {
+        expect(mockedSearchPromptAction).toHaveBeenCalled()
+      })
 
       expect(searchInput).toHaveValue(text)
-    })
-
-    it('should display original prompts list when no search query is active', async () => {
-      const customPrompts = [
-        { id: '01', title: 'Custom Prompt 1', content: 'Content 1' },
-        { id: '02', title: 'Custom Prompt 2', content: 'Content 2' },
-      ]
-      makeSut({ prompts: customPrompts })
-      const searchInput = screen.getByPlaceholderText(/buscar prompts.../i)
-
-      expect(searchInput).toHaveValue('')
-      expect(screen.getByText('Custom Prompt 1')).toBeInTheDocument()
-      expect(screen.getByText('Custom Prompt 2')).toBeInTheDocument()
     })
 
     it('should display original prompts list when no search query is active', async () => {
