@@ -100,6 +100,7 @@ export const createPromptAction = async (
 
     return {
       success: true,
+      msg: 'Prompt criado com sucesso.',
     }
   } catch (error) {
     const _error = error as Error
