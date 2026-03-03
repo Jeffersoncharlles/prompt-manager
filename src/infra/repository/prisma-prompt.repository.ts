@@ -19,8 +19,8 @@ export class PrismaPromptRepository implements PromptRepository {
     }
     return {
       ...prompt,
-      createAt: prompt.createdAt,
-      updateAt: prompt.updatedAt,
+      createdAt: prompt.createdAt,
+      updatedAt: prompt.updatedAt,
     }
   }
   async findById(id: string): Promise<Prompts | null> {
@@ -34,8 +34,8 @@ export class PrismaPromptRepository implements PromptRepository {
     }
     return {
       ...prompt,
-      createAt: prompt.createdAt,
-      updateAt: prompt.updatedAt,
+      createdAt: prompt.createdAt,
+      updatedAt: prompt.updatedAt,
     }
   }
   async create(data: CreatePromptDto): Promise<Prompts> {
@@ -44,8 +44,8 @@ export class PrismaPromptRepository implements PromptRepository {
     })
     return {
       ...prompt,
-      createAt: prompt.createdAt,
-      updateAt: prompt.updatedAt,
+      createdAt: prompt.createdAt,
+      updatedAt: prompt.updatedAt,
     }
   }
 
