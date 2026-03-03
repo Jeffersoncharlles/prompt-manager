@@ -218,5 +218,31 @@ describe('Sidebar content', () => {
 
       expect(searchInput).toHaveValue(text)
     })
+
+    it('should display original prompts list when no search query is active', async () => {
+      const customPrompts = [
+        { id: '01', title: 'Custom Prompt 1', content: 'Content 1' },
+        { id: '02', title: 'Custom Prompt 2', content: 'Content 2' },
+      ]
+      makeSut({ prompts: customPrompts })
+      const searchInput = screen.getByPlaceholderText(/buscar prompts.../i)
+
+      expect(searchInput).toHaveValue('')
+      expect(screen.getByText('Custom Prompt 1')).toBeInTheDocument()
+      expect(screen.getByText('Custom Prompt 2')).toBeInTheDocument()
+    })
+
+    it('should display original prompts list when no search query is active', async () => {
+      const customPrompts = [
+        { id: '01', title: 'Custom Prompt 1', content: 'Content 1' },
+        { id: '02', title: 'Custom Prompt 2', content: 'Content 2' },
+      ]
+      makeSut({ prompts: customPrompts })
+      const searchInput = screen.getByPlaceholderText(/buscar prompts.../i)
+
+      expect(searchInput).toHaveValue('')
+      expect(screen.getByText('Custom Prompt 1')).toBeInTheDocument()
+      expect(screen.getByText('Custom Prompt 2')).toBeInTheDocument()
+    })
   })
 })

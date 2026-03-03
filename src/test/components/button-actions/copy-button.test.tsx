@@ -114,4 +114,40 @@ describe('copy button', () => {
 
     expect(mockCopyToClipboard).toHaveBeenCalledWith(content)
   })
+
+  it('should display check icon and copiado text when isCopied is true', () => {
+    const { useCopyToClipboard } = require('@/hooks/useCopyToClipboard')
+
+    useCopyToClipboard.mockImplementationOnce(() => ({
+      isCopied: true,
+      copyToClipboard: jest.fn(),
+    }))
+
+    const content = 'Test content'
+    render(<CopyButton content={content} />)
+
+    expect(screen.getByText('Copiado')).toBeInTheDocument()
+  })
+
+  it('should display copy icon and copiar text when isCopied is false', () => {
+    const { useCopyToClipboard } = require('@/hooks/useCopyToClipboard')
+
+    useCopyToClipboard.mockImplementationOnce(() => ({
+      isCopied: false,
+      copyToClipboard: jest.fn(),
+    }))
+
+    const content = 'Test content'
+    render(<CopyButton content={content} />)
+
+    expect(screen.getByText('Copiar')).toBeInTheDocument()
+  })
+
+  it('should not be disabled when content has valid text', () => {
+    const content = 'Valid content'
+    const { getByRole } = render(<CopyButton content={content} />)
+    const button = getByRole('button')
+
+    expect(button).not.toBeDisabled()
+  })
 })

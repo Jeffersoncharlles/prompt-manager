@@ -84,4 +84,16 @@ describe('PromptForm', () => {
     })
     expect(toast.error).toHaveBeenCalledWith('Erro ao criar prompt.')
   })
+
+  it('should show an error when form is submitted with empty fields', async () => {
+    makeSut()
+
+    const submitButton = screen.getByRole('button', { name: /salvar/i })
+
+    await user.click(submitButton)
+
+    expect(screen.getByText('O título é obrigatório.')).toBeInTheDocument()
+    expect(screen.getByText('O conteúdo é obrigatório.')).toBeInTheDocument()
+    expect(createPromptActionMock).not.toHaveBeenCalled()
+  })
 })

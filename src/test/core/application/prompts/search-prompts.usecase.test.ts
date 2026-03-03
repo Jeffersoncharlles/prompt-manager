@@ -73,4 +73,25 @@ describe('SearchPromptsUseCase', () => {
     const result = await useCase.execute(query)
     expect(result).toHaveLength(2)
   })
+
+  it('should return all prompts when search term is null or undefined', async () => {
+    const findMany = jest.fn().mockResolvedValue(input)
+    const searchMany = jest.fn().mockResolvedValue([])
+
+    const repository: PromptRepository = {
+      findMany,
+      searchMany,
+      create: jest.fn(),
+      findByTitle: jest.fn(),
+      findById: jest.fn(),
+    }
+
+    const useCase = new SearchPromptsUseCase(repository)
+
+    const result = await useCase.execute(undefined as any)
+
+    expect(findMany).toHaveBeenCalled()
+    expect(searchMany).not.toHaveBeenCalled()
+    expect(result).toEqual(input)
+  })
 })

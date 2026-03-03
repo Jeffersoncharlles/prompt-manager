@@ -213,5 +213,18 @@ describe('Server Actions - Prompt Actions', () => {
       expect(result.success).toBe(false)
       expect(result.msg).toBe('Já existe um prompt com este título.')
     })
+
+    it('should return a generic error message if creation fails with other error', async () => {
+      const data = {
+        title: 'Test Prompt',
+        content: 'This is a test prompt.',
+      }
+      mockedCreateExecute.mockRejectedValue(
+        new Error('Database connection error'),
+      )
+      const result = await createPromptAction(data)
+      expect(result.success).toBe(false)
+      expect(result.msg).toBe('Ocorreu um erro ao criar o prompt.')
+    })
   })
 })

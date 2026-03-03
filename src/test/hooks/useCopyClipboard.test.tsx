@@ -78,4 +78,41 @@ describe('useCopyToClipboard', () => {
 
     expect(onError).toHaveBeenCalledWith(error)
   })
+
+  it('should use default resetDelay when options is undefined', async () => {
+    const { result } = renderHook(() => useCopyToClipboard())
+
+    await act(async () => {
+      await result.current.copyToClipboard('Test')
+    })
+
+    expect(result.current.isCopied).toBe(true)
+
+    act(() => {
+      jest.advanceTimersByTime(2000)
+    })
+
+    await waitFor(() => {
+      expect(result.current.isCopied).toBe(false)
+    })
+  })
+
+  it('should use default resetDelay when resetDelay is not provided in options', async () => {
+    const onSuccess = jest.fn()
+    const { result } = renderHook(() => useCopyToClipboard({ onSuccess }))
+
+    await act(async () => {
+      await result.current.copyToClipboard('Test')
+    })
+
+    expect(result.current.isCopied).toBe(true)
+
+    act(() => {
+      jest.advanceTimersByTime(2000)
+    })
+
+    await waitFor(() => {
+      expect(result.current.isCopied).toBe(false)
+    })
+  })
 })
