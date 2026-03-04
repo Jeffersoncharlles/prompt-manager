@@ -5,6 +5,7 @@ const BASE_URL = `http://localhost:${PORT}`
 
 export default defineConfig({
   testDir: './e2e',
+  globalSetup: './e2e/global-setup.ts',
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0,
@@ -14,6 +15,7 @@ export default defineConfig({
   use: {
     baseURL: BASE_URL,
     trace: 'on-first-retry',
+    // trace: 'on',
     screenshot: 'only-on-failure',
     video: 'retain-on-failure',
   },
@@ -22,16 +24,16 @@ export default defineConfig({
     { name: 'firefox', use: { ...devices['Desktop Firefox'] } },
     { name: 'webkit', use: { ...devices['Desktop Safari'] } },
   ],
-  // webServer: {
-  //   command: process.env.CI ? 'pnpm start' : 'pnpm dev',
-  //   url: BASE_URL,
-  //   reuseExistingServer: !process.env.CI,
-  //   timeout: 180 * 1000,
-  //   env: {
-  //     PORT,
-  //     ...(process.env.DATABASE_URL
-  //       ? { DATABASE_URL: process.env.DATABASE_URL }
-  //       : {}),
-  //   },
-  // },
+  webServer: {
+    command: process.env.CI ? 'pnpm start' : 'pnpm dev',
+    url: BASE_URL,
+    reuseExistingServer: !process.env.CI,
+    timeout: 180 * 1000,
+    env: {
+      PORT,
+      ...(process.env.DATABASE_URL
+        ? { DATABASE_URL: process.env.DATABASE_URL }
+        : {}),
+    },
+  },
 })
