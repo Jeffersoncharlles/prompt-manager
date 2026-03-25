@@ -1,4 +1,5 @@
 import type { CreatePromptDto } from '@/core/application/prompts/create-prompt.dto'
+import type { UpdatePromptDto } from '@/core/application/prompts/update-prompt.dto'
 import type {
   PromptSummary,
   Prompts,
@@ -8,6 +9,7 @@ import type { PrismaClient } from '@/generated/prisma/client'
 
 export class PrismaPromptRepository implements PromptRepository {
   constructor(private prisma: PrismaClient) {}
+
   async findByTitle(title: string): Promise<Prompts | null> {
     const prompt = await this.prisma.prompt.findFirst({
       where: {
@@ -47,6 +49,17 @@ export class PrismaPromptRepository implements PromptRepository {
       createdAt: prompt.createdAt,
       updatedAt: prompt.updatedAt,
     }
+  }
+
+  async update(data: UpdatePromptDto): Promise<Prompts> {
+    const update = await this.prisma.prompt.update({
+      where: {
+        id: data.id,
+      },
+      data,
+    })
+
+    return update
   }
 
   async findMany(): Promise<PromptSummary[]> {

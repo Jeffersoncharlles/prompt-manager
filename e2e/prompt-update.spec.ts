@@ -36,7 +36,7 @@ test.describe('Prompt Update Page', async () => {
 
     await page.goto(`/prompts/${createdPrompt.id}`)
 
-    await expect(page.getByPlaceholder('Prompt Title')).toBeVisible()
+    await expect(page.getByPlaceholder('Titulo do prompt')).toBeVisible()
 
     await page.fill('input[name="title"]', updatedTitle)
     await page.fill('textarea[name="content"]', updatedContent)

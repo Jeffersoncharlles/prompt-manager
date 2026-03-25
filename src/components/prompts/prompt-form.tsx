@@ -4,29 +4,40 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useRouter } from 'next/navigation'
 import { useForm, useWatch } from 'react-hook-form'
 import { toast } from 'sonner'
-import { createPromptAction } from '@/app/actions/prompt.actions'
+import {
+  createPromptAction,
+  updatePromptAction,
+} from '@/app/actions/prompt.actions'
 import {
   type CreatePromptDto,
   createPromptSchema,
 } from '@/core/application/prompts/create-prompt.dto'
+import type { Prompts } from '@/core/domain/prompts/prompt.entity'
 import { CopyButton } from '../button-actions/copy-button'
 import { Button } from '../ui/button'
 import { Form, FormControl, FormField, FormItem, FormMessage } from '../ui/form'
 import { Input } from '../ui/input'
 import { Textarea } from '../ui/textarea'
 
-export const PromptForm = () => {
+type PromptFormProps = {
+  prompt?: Prompts | null
+}
+
+export const PromptForm = ({ prompt }: PromptFormProps) => {
   const router = useRouter()
+  const isEdit = !!prompt?.id
   const form = useForm<CreatePromptDto>({
     resolver: zodResolver(createPromptSchema),
     defaultValues: {
-      title: '',
-      content: '',
+      title: prompt?.title || '',
+      content: prompt?.content || '',
     },
   })
 
   const submitHandler = async (data: CreatePromptDto) => {
-    const result = await createPromptAction(data)
+    const result = isEdit
+      ? await updatePromptAction({ id: prompt!.id, ...data })
+      : await createPromptAction(data)
 
     if (!result.success) {
       return toast.error(result.msg)
