@@ -36,7 +36,9 @@ export const PromptForm = ({ prompt }: PromptFormProps) => {
 
   const submitHandler = async (data: CreatePromptDto) => {
     const result = isEdit
-      ? await updatePromptAction({ id: prompt!.id, ...data })
+      ? prompt?.id
+        ? await updatePromptAction({ id: prompt.id, ...data })
+        : { success: false, msg: 'Prompt invalido para edicao' }
       : await createPromptAction(data)
 
     if (!result.success) {

@@ -83,13 +83,6 @@ describe('Server Actions - Prompt Actions', () => {
     })
 
     it('should return an error message if the search fails', async () => {
-      const input = [
-        {
-          id: '01',
-          title: 'Example Prompt',
-          content: 'This is an example prompt.',
-        },
-      ]
       mockedSearchExecute.mockRejectedValue(
         new Error('Ocorreu um erro ao buscar os prompts.'),
       )

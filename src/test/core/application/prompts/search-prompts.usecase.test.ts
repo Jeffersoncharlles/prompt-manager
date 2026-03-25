@@ -35,6 +35,7 @@ describe('SearchPromptsUseCase', () => {
     create: jest.fn(),
     findByTitle: jest.fn(),
     findById: jest.fn(),
+    update: jest.fn(),
   }
 
   it('should return prompts when the search term is empty', async () => {
@@ -65,6 +66,7 @@ describe('SearchPromptsUseCase', () => {
       create: jest.fn(),
       findByTitle: jest.fn(),
       findById: jest.fn(),
+      update: jest.fn(),
     }
 
     const useCase = new SearchPromptsUseCase(repository)
@@ -84,11 +86,12 @@ describe('SearchPromptsUseCase', () => {
       create: jest.fn(),
       findByTitle: jest.fn(),
       findById: jest.fn(),
+      update: jest.fn(),
     }
 
     const useCase = new SearchPromptsUseCase(repository)
 
-    const result = await useCase.execute(undefined as any)
+    const result = await useCase.execute(undefined as unknown as string)
 
     expect(findMany).toHaveBeenCalled()
     expect(searchMany).not.toHaveBeenCalled()

@@ -35,6 +35,7 @@ describe('GetAllPromptsUseCase', () => {
     create: jest.fn(),
     findByTitle: jest.fn(),
     findById: jest.fn(),
+    update: jest.fn(),
   }
 
   it('should return get all prompts', async () => {

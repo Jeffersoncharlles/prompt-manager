@@ -1,3 +1,4 @@
+import type { PrismaClient } from '@/generated/prisma/client'
 import { PrismaPromptRepository } from '@/infra/repository/prisma-prompt.repository'
 
 function createMockPrisma() {
@@ -18,7 +19,7 @@ describe('PrismaPromptRepository', () => {
 
   beforeEach(() => {
     prisma = createMockPrisma()
-    repository = new PrismaPromptRepository(prisma as any)
+    repository = new PrismaPromptRepository(prisma as unknown as PrismaClient)
   })
 
   describe('findByTitle', () => {

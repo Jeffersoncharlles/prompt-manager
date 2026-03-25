@@ -1,12 +1,26 @@
 import '@testing-library/jest-dom'
 
-import { webcrypto } from 'crypto'
-import { TextDecoder, TextEncoder } from 'util'
+import { webcrypto } from 'node:crypto'
+import { TextDecoder, TextEncoder } from 'node:util'
 
-;(global as any).TextEncoder = TextEncoder
-;(global as any).TextDecoder = TextDecoder
-if (!(global as any).crypto) {
-  ;(global as any).crypto = webcrypto
+Object.defineProperty(globalThis, 'TextEncoder', {
+  value: TextEncoder,
+  configurable: true,
+  writable: true,
+})
+
+Object.defineProperty(globalThis, 'TextDecoder', {
+  value: TextDecoder,
+  configurable: true,
+  writable: true,
+})
+
+if (!globalThis.crypto) {
+  Object.defineProperty(globalThis, 'crypto', {
+    value: webcrypto,
+    configurable: true,
+    writable: true,
+  })
 }
 
 // Suppress React 19 act() warnings for tests
