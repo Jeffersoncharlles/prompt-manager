@@ -6,6 +6,7 @@ import {
   createPromptSchema,
 } from '@/core/application/prompts/create-prompt.dto'
 import { CreatePromptUseCase } from '@/core/application/prompts/create-prompt.use-case'
+import { DeletePromptUseCase } from '@/core/application/prompts/delete-prompt.use-case'
 import { GetAllPromptsUseCase } from '@/core/application/prompts/get-all-prompts.use-case'
 import { SearchPromptsUseCase } from '@/core/application/prompts/search-prompts.use-case'
 import {
@@ -162,4 +163,38 @@ export const updatePromptAction = async (
     }
   }
 }
+// #endregion
+
+// #region Delete Prompt Action
+export const deletePromptAction = async (id: string): Promise<FormState> => {
+  if (!id) {
+    return {
+      success: false,
+      msg: 'ID do prompt é obrigatório.',
+    }
+  }
+  try {
+    const repository = new PrismaPromptRepository(prisma)
+    const useCase = new DeletePromptUseCase(repository)
+    await useCase.execute({ id })
+    return {
+      success: true,
+      msg: 'Prompt deletado com sucesso.',
+    }
+  } catch (error) {
+    const _error = error as Error
+    if (_error instanceof ResourceNotFoundError) {
+      return {
+        success: false,
+        msg: 'Prompt não encontrado.',
+      }
+    }
+
+    return {
+      success: false,
+      msg: 'Ocorreu um erro ao atualizar o prompt.',
+    }
+  }
+}
+
 // #endregion

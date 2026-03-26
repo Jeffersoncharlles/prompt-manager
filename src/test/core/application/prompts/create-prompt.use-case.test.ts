@@ -14,6 +14,7 @@ describe('CreatePromptUseCase', () => {
       searchMany: jest.fn(),
       create: jest.fn(),
       update: jest.fn(),
+      delete: jest.fn(),
     }
     useCase = new CreatePromptUseCase(repository)
   })

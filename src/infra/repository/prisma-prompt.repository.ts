@@ -1,4 +1,5 @@
 import type { CreatePromptDto } from '@/core/application/prompts/create-prompt.dto'
+import type { DeletePromptDto } from '@/core/application/prompts/delete-prompt.dto'
 import type { UpdatePromptDto } from '@/core/application/prompts/update-prompt.dto'
 import type {
   PromptSummary,
@@ -9,6 +10,37 @@ import type { PrismaClient } from '@/generated/prisma/client'
 
 export class PrismaPromptRepository implements PromptRepository {
   constructor(private prisma: PrismaClient) {}
+
+  async create(data: CreatePromptDto): Promise<Prompts> {
+    const prompt = await this.prisma.prompt.create({
+      data,
+    })
+    return {
+      ...prompt,
+      createdAt: prompt.createdAt,
+      updatedAt: prompt.updatedAt,
+    }
+  }
+
+  async update(data: UpdatePromptDto): Promise<Prompts> {
+    const { id, ...updateData } = data
+
+    const update = await this.prisma.prompt.update({
+      where: {
+        id,
+      },
+      data: updateData,
+    })
+
+    return update
+  }
+  async delete(data: DeletePromptDto): Promise<void> {
+    await this.prisma.prompt.delete({
+      where: {
+        id: data.id,
+      },
+    })
+  }
 
   async findByTitle(title: string): Promise<Prompts | null> {
     const prompt = await this.prisma.prompt.findFirst({
@@ -39,29 +71,6 @@ export class PrismaPromptRepository implements PromptRepository {
       createdAt: prompt.createdAt,
       updatedAt: prompt.updatedAt,
     }
-  }
-  async create(data: CreatePromptDto): Promise<Prompts> {
-    const prompt = await this.prisma.prompt.create({
-      data,
-    })
-    return {
-      ...prompt,
-      createdAt: prompt.createdAt,
-      updatedAt: prompt.updatedAt,
-    }
-  }
-
-  async update(data: UpdatePromptDto): Promise<Prompts> {
-    const { id, ...updateData } = data
-
-    const update = await this.prisma.prompt.update({
-      where: {
-        id,
-      },
-      data: updateData,
-    })
-
-    return update
   }
 
   async findMany(): Promise<PromptSummary[]> {

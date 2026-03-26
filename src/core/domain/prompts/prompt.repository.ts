@@ -11,4 +11,5 @@ export interface PromptRepository {
   ): Promise<Prompts>
   findByTitle(title: string): Promise<Prompts | null>
   findById(id: string): Promise<Prompts | null>
+  delete(data: { id: string }): Promise<void>
 }

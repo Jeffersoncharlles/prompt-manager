@@ -297,4 +297,6 @@ describe('Server Actions - Prompt Actions', () => {
       expect(result.msg).toBe('Ocorreu um erro ao atualizar o prompt.')
     })
   })
+
+  describe('deletePromptAction', () => {})
 })

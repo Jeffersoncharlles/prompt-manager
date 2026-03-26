@@ -36,6 +36,7 @@ describe('SearchPromptsUseCase', () => {
     findByTitle: jest.fn(),
     findById: jest.fn(),
     update: jest.fn(),
+    delete: jest.fn(),
   }
 
   it('should return prompts when the search term is empty', async () => {
@@ -67,6 +68,7 @@ describe('SearchPromptsUseCase', () => {
       findByTitle: jest.fn(),
       findById: jest.fn(),
       update: jest.fn(),
+      delete: jest.fn(),
     }
 
     const useCase = new SearchPromptsUseCase(repository)
@@ -87,6 +89,7 @@ describe('SearchPromptsUseCase', () => {
       findByTitle: jest.fn(),
       findById: jest.fn(),
       update: jest.fn(),
+      delete: jest.fn(),
     }
 
     const useCase = new SearchPromptsUseCase(repository)
