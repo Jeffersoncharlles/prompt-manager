@@ -1,6 +1,7 @@
 import type { UpdatePromptDto } from '@/core/application/prompts/update-prompt.dto'
 import { UpdatePromptUseCase } from '@/core/application/prompts/update-prompt.use-case'
 import type { PromptRepository } from '@/core/domain/prompts/prompt.repository'
+import { ConflictError } from '@/core/errors/app-errors'
 
 const makeRepository = (overrideValues: Partial<PromptRepository>) => {
   const base = {
@@ -69,5 +70,57 @@ describe('UpdatePromptUseCase', () => {
     }
 
     await expect(useCase.execute(input)).rejects.toThrow('PROMPT')
+  })
+  it('should throw ConflictError when prompt title already exists', async () => {
+    const repository = makeRepository({
+      findById: jest.fn().mockResolvedValue({
+        ...promptData,
+      }),
+      findByTitle: jest.fn().mockResolvedValue({
+        ...promptData,
+        id: '02',
+        title: 'new Prompt',
+      }),
+    })
+
+    const useCase = new UpdatePromptUseCase(repository)
+    const input: UpdatePromptDto = {
+      id: '01',
+      title: 'new Prompt',
+      content: 'This is an  prompt.',
+    }
+
+    await expect(useCase.execute(input)).rejects.toThrow(ConflictError)
+  })
+
+  it('should skip title conflict check when title is not provided', async () => {
+    const repository = makeRepository({
+      findById: jest.fn().mockResolvedValue({
+        ...promptData,
+      }),
+      findByTitle: jest.fn().mockResolvedValue({
+        ...promptData,
+        id: '02',
+      }),
+      update: jest.fn().mockResolvedValue({
+        ...promptData,
+        content: 'Updated only content',
+      }),
+    })
+
+    const useCase = new UpdatePromptUseCase(repository)
+    const input: UpdatePromptDto = {
+      id: '01',
+      content: 'Updated only content',
+    }
+
+    const result = await useCase.execute(input)
+
+    expect(result.content).toBe(input.content)
+    expect(repository.findByTitle).not.toHaveBeenCalled()
+    expect(repository.update).toHaveBeenCalledWith({
+      id: input.id,
+      content: input.content,
+    })
   })
 })

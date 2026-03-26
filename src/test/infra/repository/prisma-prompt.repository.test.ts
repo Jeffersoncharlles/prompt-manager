@@ -8,6 +8,7 @@ function createMockPrisma() {
       findFirst: jest.fn(),
       findUnique: jest.fn(),
       create: jest.fn(),
+      update: jest.fn(),
     },
   }
   return mock
@@ -328,6 +329,49 @@ describe('PrismaPromptRepository', () => {
         repository.create({
           title: 'New Prompt',
           content: 'New Content',
+        }),
+      ).rejects.toThrow('Database constraint violation')
+    })
+  })
+
+  describe('update', () => {
+    it('should update an existing prompt', async () => {
+      const now = new Date()
+      const input = {
+        id: 'clx1234567890abcdef12345',
+        title: 'Updated Prompt',
+        content: 'Updated Content',
+        createdAt: now,
+        updatedAt: now,
+      }
+
+      prisma.prompt.update.mockResolvedValue(input)
+
+      const result = await repository.update({
+        id: 'clx1234567890abcdef12345',
+        title: 'Updated Prompt',
+        content: 'Updated Content',
+      })
+
+      expect(prisma.prompt.update).toHaveBeenCalledWith({
+        where: { id: 'clx1234567890abcdef12345' },
+        data: {
+          title: 'Updated Prompt',
+          content: 'Updated Content',
+        },
+      })
+      expect(result).toMatchObject(input)
+    })
+
+    it('should throw error when prisma update fails', async () => {
+      const error = new Error('Database constraint violation')
+      prisma.prompt.update.mockRejectedValue(error)
+
+      await expect(
+        repository.update({
+          id: 'clx1234567890abcdef12345',
+          title: 'Updated Prompt',
+          content: 'Updated Content',
         }),
       ).rejects.toThrow('Database constraint violation')
     })

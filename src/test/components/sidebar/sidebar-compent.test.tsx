@@ -239,5 +239,27 @@ describe('Sidebar content', () => {
       expect(screen.getByText('Custom Prompt 1')).toBeInTheDocument()
       expect(screen.getByText('Custom Prompt 2')).toBeInTheDocument()
     })
+
+    it('should fallback to original prompts when query is active and search result has no prompts', async () => {
+      mockedSearchPromptAction.mockResolvedValue({
+        success: false,
+        msg: 'Erro ao buscar prompts',
+      })
+
+      const customPrompts = [
+        { id: '01', title: 'Custom Prompt 1', content: 'Content 1' },
+      ]
+
+      makeSut({ prompts: customPrompts })
+      const searchInput = screen.getByPlaceholderText(/buscar prompts.../i)
+
+      await user.type(searchInput, 'Custom')
+
+      await waitFor(() => {
+        expect(mockedSearchPromptAction).toHaveBeenCalled()
+      })
+
+      expect(screen.getByText('Custom Prompt 1')).toBeInTheDocument()
+    })
   })
 })

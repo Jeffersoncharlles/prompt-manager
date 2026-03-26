@@ -1,6 +1,9 @@
 import userEvent from '@testing-library/user-event'
 import { toast } from 'sonner'
-import { PromptForm } from '@/components/prompts/prompt-form'
+import {
+  PromptForm,
+  type PromptFormProps,
+} from '@/components/prompts/prompt-form'
 import { render, screen } from '@/lib/test-util'
 
 const refreshMock = jest.fn()
@@ -19,13 +22,15 @@ jest.mock('sonner', () => ({
 }))
 
 const createPromptActionMock = jest.fn()
+const updatePromptActionMock = jest.fn()
 
 jest.mock('@/app/actions/prompt.actions', () => ({
   createPromptAction: (...data: unknown[]) => createPromptActionMock(...data),
+  updatePromptAction: (...data: unknown[]) => updatePromptActionMock(...data),
 }))
 
-const makeSut = () => {
-  return render(<PromptForm />)
+const makeSut = ({ prompt }: PromptFormProps = {} as PromptFormProps) => {
+  return render(<PromptForm prompt={prompt} />)
 }
 
 describe('PromptForm', () => {
@@ -66,7 +71,7 @@ describe('PromptForm', () => {
       success: false,
       msg: 'Erro ao criar prompt.',
     })
-    makeSut()
+    makeSut({})
 
     const titleInput = screen.getByPlaceholderText(/titulo do prompt/i)
     const contentInput = screen.getByPlaceholderText(
@@ -95,5 +100,42 @@ describe('PromptForm', () => {
     expect(screen.getByText('O título é obrigatório.')).toBeInTheDocument()
     expect(screen.getByText('O conteúdo é obrigatório.')).toBeInTheDocument()
     expect(createPromptActionMock).not.toHaveBeenCalled()
+  })
+
+  it('should update a prompt is success', async () => {
+    updatePromptActionMock.mockResolvedValueOnce({
+      success: true,
+      msg: 'Prompt atualizado com sucesso.',
+    })
+    const prompt = {
+      id: '1',
+      title: 'Existing Prompt',
+      content: 'This is an existing prompt.',
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    }
+
+    makeSut({ prompt })
+
+    const titleInput = screen.getByPlaceholderText(/titulo do prompt/i)
+    const contentInput = screen.getByPlaceholderText(
+      'Digite o conteudo do prompt...',
+    )
+    const submitButton = screen.getByRole('button', { name: /salvar/i })
+
+    await user.clear(titleInput)
+    await user.clear(contentInput)
+    await user.type(titleInput, 'Updated Prompt')
+    await user.type(contentInput, 'This is an updated prompt.')
+    await user.click(submitButton)
+
+    expect(updatePromptActionMock).toHaveBeenCalledWith({
+      id: prompt.id,
+      title: 'Updated Prompt',
+      content: 'This is an updated prompt.',
+    })
+    expect(toast.success).toHaveBeenCalledWith('Prompt atualizado com sucesso.')
+
+    expect(refreshMock).toHaveBeenCalled()
   })
 })

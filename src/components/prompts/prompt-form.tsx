@@ -19,13 +19,12 @@ import { Form, FormControl, FormField, FormItem, FormMessage } from '../ui/form'
 import { Input } from '../ui/input'
 import { Textarea } from '../ui/textarea'
 
-type PromptFormProps = {
+export type PromptFormProps = {
   prompt?: Prompts | null
 }
 
 export const PromptForm = ({ prompt }: PromptFormProps) => {
   const router = useRouter()
-  const isEdit = !!prompt?.id
   const form = useForm<CreatePromptDto>({
     resolver: zodResolver(createPromptSchema),
     defaultValues: {
@@ -35,10 +34,8 @@ export const PromptForm = ({ prompt }: PromptFormProps) => {
   })
 
   const submitHandler = async (data: CreatePromptDto) => {
-    const result = isEdit
-      ? prompt?.id
-        ? await updatePromptAction({ id: prompt.id, ...data })
-        : { success: false, msg: 'Prompt invalido para edicao' }
+    const result = prompt?.id
+      ? await updatePromptAction({ id: prompt.id, ...data })
       : await createPromptAction(data)
 
     if (!result.success) {

@@ -4,6 +4,7 @@ import {
   searchPromptAction,
   updatePromptAction,
 } from '@/app/actions/prompt.actions'
+import { ConflictError, ResourceNotFoundError } from '@/core/errors/app-errors'
 
 // Mock prisma to avoid TextEncoder error in JSDOM
 jest.mock('@/lib/prisma', () => ({
@@ -13,6 +14,7 @@ jest.mock('@/lib/prisma', () => ({
 const mockedSearchExecute = jest.fn()
 const mockedFindManyExecute = jest.fn()
 const mockedCreateExecute = jest.fn()
+const mockedUpdateExecute = jest.fn()
 
 jest.mock('@/infra/repository/prisma-prompt.repository', () => ({
   PrismaPromptRepository: jest.fn().mockImplementation(() => ({})),
@@ -35,7 +37,7 @@ jest.mock('@/core/application/prompts/create-prompt.use-case', () => ({
 }))
 jest.mock('@/core/application/prompts/update-prompt.use-case', () => ({
   UpdatePromptUseCase: jest.fn().mockImplementation(() => ({
-    execute: mockedCreateExecute,
+    execute: mockedUpdateExecute,
   })),
 }))
 
@@ -227,35 +229,72 @@ describe('Server Actions - Prompt Actions', () => {
     })
   })
   describe('updatePromptAction', () => {
-    // it('should return an error message if the data is invalid', async () => {
-    //   const data = {
-    //     title: '',
-    //     content: '',
-    //   }
-    //   const result = await updatePromptAction(data)
-    //   expect(result.success).toBe(false)
-    //   expect(result.msg).toBe('Dados inválidos.')
-    //   expect(result.errors).toBeDefined()
-    // })
-    // it('should update a prompt successfully', async () => {
-    //   const data = {
-    //     title: 'Test Prompt',
-    //     content: 'This is a test prompt.',
-    //   }
-    //   const result = await updatePromptAction(data)
-    //   expect(result.success).toBe(true)
-    // })
-    // it('should return an error message if the prompt already exists', async () => {
-    //   const data = {
-    //     title: 'Test Prompt',
-    //     content: 'This is a test prompt.',
-    //   }
-    //   mockedCreateExecute.mockRejectedValue(
-    //     new Error('Prompt_with_this_title_already_exists.'),
-    //   )
-    //   const result = await updatePromptAction(data)
-    //   expect(result.success).toBe(false)
-    //   expect(result.msg).toBe('Já existe um prompt com este título.')
-    // })
+    it('should update a prompt successfully', async () => {
+      mockedUpdateExecute.mockResolvedValue({})
+
+      const data = {
+        id: 'clx1234567890abcdef12345',
+        title: 'Test Prompt',
+        content: 'This is a test prompt.',
+      }
+
+      const result = await updatePromptAction(data)
+      expect(result.success).toBe(true)
+      expect(result).toMatchObject({
+        success: true,
+        msg: 'Prompt atualizado com sucesso.',
+      })
+    })
+
+    it('should return an error message if the data is invalid', async () => {
+      const data = {
+        id: '01',
+        title: '',
+        content: '',
+      }
+      const result = await updatePromptAction(data)
+      expect(result.success).toBe(false)
+      expect(result.msg).toBe('Dados inválidos.')
+      expect(result.errors).toBeDefined()
+    })
+    it('should return an error message ResourceNotFoundError if the prompt does not exist', async () => {
+      mockedUpdateExecute.mockRejectedValue(new ResourceNotFoundError('PROMPT'))
+      const data = {
+        id: 'clx1234567890abcdef12345',
+        title: 'Test Prompt',
+        content: 'This is a test prompt.',
+      }
+
+      const result = await updatePromptAction(data)
+      expect(result.success).toBe(false)
+      expect(result.msg).toBe('Prompt não encontrado.')
+    })
+
+    it('should return an error message if the prompt title already exists', async () => {
+      mockedUpdateExecute.mockRejectedValue(new ConflictError())
+      const data = {
+        id: 'clx1234567890abcdef12345',
+        title: 'Test Prompt',
+        content: 'This is a test prompt.',
+      }
+
+      const result = await updatePromptAction(data)
+      expect(result.success).toBe(false)
+      expect(result.msg).toBe('Já existe um prompt com este título.')
+    })
+    it('should return a generic error message if update fails with other error', async () => {
+      mockedUpdateExecute.mockRejectedValue(
+        new Error('Database connection error'),
+      )
+      const data = {
+        id: 'clx1234567890abcdef12345',
+        title: 'Test Prompt',
+        content: 'This is a test prompt.',
+      }
+
+      const result = await updatePromptAction(data)
+      expect(result.success).toBe(false)
+      expect(result.msg).toBe('Ocorreu um erro ao atualizar o prompt.')
+    })
   })
 })

@@ -52,11 +52,13 @@ export class PrismaPromptRepository implements PromptRepository {
   }
 
   async update(data: UpdatePromptDto): Promise<Prompts> {
+    const { id, ...updateData } = data
+
     const update = await this.prisma.prompt.update({
       where: {
-        id: data.id,
+        id,
       },
-      data,
+      data: updateData,
     })
 
     return update
