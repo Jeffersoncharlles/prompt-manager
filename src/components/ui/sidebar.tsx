@@ -9,12 +9,12 @@ const SidebarRoot = ({ className, ...props }: SidebarRootProps) => {
       className={twMerge(
         'group flex flex-col h-full bg-neutral-800 border-r border-neutral-700 ',
         'transition-[width,transform] duration-300 ease-in-out',
-        // 1. MOBILE (Base)
+        // MOBILE (Base): Fixo e escondido
         'fixed inset-y-0 left-0 z-50 w-[80vw] sm:w-[320px]',
         'data-[mobile-open=false]:-translate-x-full data-[mobile-open=true]:translate-x-0',
-
-        // 2. DESKTOP RESET ()
+        // DESKTOP (MD):
         'md:!relative md:!inset-auto md:!translate-x-0 md:!z-0 md:flex-shrink-0',
+        // LARGURA DESKTOP
         'data-[collapsed=true]:md:w-16 data-[collapsed=false]:md:w-[384px]',
         className,
       )}

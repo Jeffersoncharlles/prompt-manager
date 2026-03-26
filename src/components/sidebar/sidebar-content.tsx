@@ -24,7 +24,6 @@ export type SidebarContentProps = {
 
 export const SidebarContent = ({ prompts }: SidebarContentProps) => {
   const [isMobileOpen, setIsMobileOpen] = useState(false)
-  const [isMounted, setIsMounted] = useState(false)
   const formRef = useRef<HTMLFormElement | null>(null)
   const searchParams = useSearchParams()
 
@@ -41,22 +40,9 @@ export const SidebarContent = ({ prompts }: SidebarContentProps) => {
   const promptList = hasQuery ? (searchFormState.prompts ?? prompts) : prompts
 
   const [isCollapsed, setIsCollapsed] = useState(false)
-  const collapseSidebar = () => setIsCollapsed(true)
-
-  const expandSidebar = () => {
-    setIsCollapsed(false)
-  }
 
   const handleNewPrompt = () => {
     router.push('/prompts/new')
-  }
-
-  const openMobileMenu = () => {
-    setIsMobileOpen(true)
-  }
-
-  const closeMobileMenu = () => {
-    setIsMobileOpen(false)
   }
 
   const handleQueryChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -78,34 +64,14 @@ export const SidebarContent = ({ prompts }: SidebarContentProps) => {
     formRef.current?.requestSubmit()
   }, [hasQuery])
 
-  useEffect(() => {
-    setIsMounted(true)
-
-    const checkScreen = () => {
-      if (window.innerWidth >= 768) {
-        // md breakpoint
-        setIsMobileOpen(false)
-      }
-    }
-
-    window.addEventListener('resize', checkScreen)
-    return () => window.removeEventListener('resize', checkScreen)
-  }, [])
-
-  if (!isMounted) {
-    return null
-  }
-
   return (
     <>
       <Button
-        data-mobile-open={isMobileOpen}
         title="Abrir Menu"
         aria-label="Abrir Menu"
-        aria-expanded={isMobileOpen}
         variant={'secondary'}
         className="fixed top-6 left-6 z-40 md:!hidden inline-flex"
-        onClick={openMobileMenu}
+        onClick={() => setIsMobileOpen(true)}
       >
         <Menu className="size-5 text-neutral-100" />
       </Button>
@@ -122,7 +88,7 @@ export const SidebarContent = ({ prompts }: SidebarContentProps) => {
                 variant={'secondary'}
                 aria-label="Fechar menu"
                 title="Fechar menu"
-                onClick={closeMobileMenu}
+                onClick={() => setIsMobileOpen(false)}
                 className="md:hidden"
               >
                 <X className="size-5 text-neutral-100" />
@@ -136,7 +102,7 @@ export const SidebarContent = ({ prompts }: SidebarContentProps) => {
               <Logo />
               <Button
                 variant={'sidebar'}
-                onClick={collapseSidebar}
+                onClick={() => setIsCollapsed(!isCollapsed)}
                 aria-label="Minimizar menu"
                 title="Minimizar menu"
               >
@@ -188,7 +154,7 @@ export const SidebarContent = ({ prompts }: SidebarContentProps) => {
             variant={'sidebar'}
             aria-label="Expandir menu"
             title="Expandir menu"
-            onClick={expandSidebar}
+            onClick={() => setIsCollapsed(false)}
           >
             <ArrowRightToLine className="size-5 text-neutral-100" />
           </Button>

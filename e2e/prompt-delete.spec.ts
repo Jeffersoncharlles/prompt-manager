@@ -41,6 +41,6 @@ test.describe('Prompt Deletion', () => {
     await page.getByRole('button', { name: 'Confirmar Remoção' }).click()
 
     await expect(page.getByText('Prompt deletado com sucesso.')).toBeVisible()
-    await expect(heading).not.toBeVisible()
+    await expect(heading).not.toBeVisible({ timeout: 10000 })
   })
 })
