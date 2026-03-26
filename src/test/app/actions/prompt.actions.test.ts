@@ -1,5 +1,6 @@
 import {
   createPromptAction,
+  deletePromptAction,
   getAllPrompts,
   searchPromptAction,
   updatePromptAction,
@@ -15,6 +16,7 @@ const mockedSearchExecute = jest.fn()
 const mockedFindManyExecute = jest.fn()
 const mockedCreateExecute = jest.fn()
 const mockedUpdateExecute = jest.fn()
+const mockedDeleteExecute = jest.fn()
 
 jest.mock('@/infra/repository/prisma-prompt.repository', () => ({
   PrismaPromptRepository: jest.fn().mockImplementation(() => ({})),
@@ -38,6 +40,11 @@ jest.mock('@/core/application/prompts/create-prompt.use-case', () => ({
 jest.mock('@/core/application/prompts/update-prompt.use-case', () => ({
   UpdatePromptUseCase: jest.fn().mockImplementation(() => ({
     execute: mockedUpdateExecute,
+  })),
+}))
+jest.mock('@/core/application/prompts/delete-prompt.use-case', () => ({
+  DeletePromptUseCase: jest.fn().mockImplementation(() => ({
+    execute: mockedDeleteExecute,
   })),
 }))
 
@@ -298,5 +305,38 @@ describe('Server Actions - Prompt Actions', () => {
     })
   })
 
-  describe('deletePromptAction', () => {})
+  describe('deletePromptAction', () => {
+    it('should delete a prompt successfully', async () => {
+      const withoutIdResult = await deletePromptAction('')
+      expect(withoutIdResult.success).toBe(false)
+      expect(withoutIdResult.msg).toBe('ID do prompt é obrigatório.')
+      expect(mockedDeleteExecute).not.toHaveBeenCalled()
+
+      const result = await deletePromptAction('clx1234567890abcdef12345')
+      expect(result.success).toBe(true)
+      expect(result).toMatchObject({
+        success: true,
+        msg: 'Prompt deletado com sucesso.',
+      })
+      expect(mockedDeleteExecute).toHaveBeenCalledWith({
+        id: 'clx1234567890abcdef12345',
+      })
+    })
+    it('should return an error message if the prompt does not exist', async () => {
+      mockedDeleteExecute.mockRejectedValue(new ResourceNotFoundError('PROMPT'))
+
+      const result = await deletePromptAction('clx1234567890abcdef12345')
+      expect(result.success).toBe(false)
+      expect(result.msg).toBe('Prompt não encontrado.')
+    })
+    it('should return a generic error message if deletion fails with other error', async () => {
+      mockedDeleteExecute.mockRejectedValue(
+        new Error('Database connection error'),
+      )
+
+      const result = await deletePromptAction('clx1234567890abcdef12345')
+      expect(result.success).toBe(false)
+      expect(result.msg).toBe('Ocorreu um erro ao deletar o prompt.')
+    })
+  })
 })

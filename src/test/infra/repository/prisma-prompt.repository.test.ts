@@ -9,6 +9,7 @@ function createMockPrisma() {
       findUnique: jest.fn(),
       create: jest.fn(),
       update: jest.fn(),
+      delete: jest.fn(),
     },
   }
   return mock
@@ -373,6 +374,37 @@ describe('PrismaPromptRepository', () => {
           title: 'Updated Prompt',
           content: 'Updated Content',
         }),
+      ).rejects.toThrow('Database constraint violation')
+    })
+  })
+
+  describe('delete', () => {
+    it('should delete an existing prompt', async () => {
+      const now = new Date()
+      const input = {
+        id: 'clx1234567890abcdef12345',
+        title: 'Deleted Prompt',
+        content: 'Deleted Content',
+        createdAt: now,
+        updatedAt: now,
+      }
+
+      prisma.prompt.delete.mockResolvedValue(input)
+
+      const result = await repository.delete({ id: 'clx1234567890abcdef12345' })
+
+      expect(prisma.prompt.delete).toHaveBeenCalledWith({
+        where: { id: 'clx1234567890abcdef12345' },
+      })
+      expect(result).toBeUndefined()
+    })
+
+    it('should throw error when prisma delete fails', async () => {
+      const error = new Error('Database constraint violation')
+      prisma.prompt.delete.mockRejectedValue(error)
+
+      await expect(
+        repository.delete({ id: 'clx1234567890abcdef12345' }),
       ).rejects.toThrow('Database constraint violation')
     })
   })

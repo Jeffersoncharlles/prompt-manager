@@ -192,7 +192,7 @@ export const deletePromptAction = async (id: string): Promise<FormState> => {
 
     return {
       success: false,
-      msg: 'Ocorreu um erro ao atualizar o prompt.',
+      msg: 'Ocorreu um erro ao deletar o prompt.',
     }
   }
 }
