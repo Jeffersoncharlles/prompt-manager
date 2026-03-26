@@ -1,6 +1,6 @@
 'use client'
 
-import { ArrowLeftToLine, ArrowRightToLine, Plus, X } from 'lucide-react'
+import { ArrowLeftToLine, ArrowRightToLine, Menu, Plus, X } from 'lucide-react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import {
   startTransition,
@@ -23,6 +23,8 @@ export type SidebarContentProps = {
 }
 
 export const SidebarContent = ({ prompts }: SidebarContentProps) => {
+  const [isMobileOpen, setIsMobileOpen] = useState(false)
+  const [isMounted, setIsMounted] = useState(false)
   const formRef = useRef<HTMLFormElement | null>(null)
   const searchParams = useSearchParams()
 
@@ -49,6 +51,14 @@ export const SidebarContent = ({ prompts }: SidebarContentProps) => {
     router.push('/prompts/new')
   }
 
+  const openMobileMenu = () => {
+    setIsMobileOpen(true)
+  }
+
+  const closeMobileMenu = () => {
+    setIsMobileOpen(false)
+  }
+
   const handleQueryChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const newQuery = event.target.value
     setQuery(newQuery)
@@ -68,106 +78,142 @@ export const SidebarContent = ({ prompts }: SidebarContentProps) => {
     formRef.current?.requestSubmit()
   }, [hasQuery])
 
+  useEffect(() => {
+    setIsMounted(true)
+
+    const checkScreen = () => {
+      if (window.innerWidth >= 768) {
+        // md breakpoint
+        setIsMobileOpen(false)
+      }
+    }
+
+    window.addEventListener('resize', checkScreen)
+    return () => window.removeEventListener('resize', checkScreen)
+  }, [])
+
+  if (!isMounted) {
+    return null
+  }
+
   return (
-    <Sidebar.Root data-collapsed={isCollapsed}>
-      <Sidebar.Section aria-label="sidebar content" title="sidebar content">
-        {/* menu Hamburg */}
-        <Sidebar.Menu>
-          <div className="flex items-center justify-between">
-            <Button
-              variant={'secondary'}
-              aria-label="Fechar menu"
-              title="Fechar menu"
-            >
-              <X className="size-5 text-neutral-100" />
-            </Button>
-          </div>
-        </Sidebar.Menu>
-
-        <div className="flex w-full items-center justify-between mb-6">
-          {/* closed aside */}
-          <Sidebar.Header>
-            <Logo />
-            <Button
-              variant={'sidebar'}
-              onClick={collapseSidebar}
-              aria-label="Minimizar menu"
-              title="Minimizar menu"
-            >
-              <ArrowLeftToLine className="size-5 text-neutral-100" />
-            </Button>
-          </Sidebar.Header>
-        </div>
-        <section className="mb-5 ">
-          <form
-            ref={formRef}
-            action={setSearchFormState}
-            className="relative group w-full"
-          >
-            <Input
-              type="text"
-              name="q"
-              value={query}
-              placeholder="Buscar prompts..."
-              onChange={handleQueryChange}
-              autoFocus
-            />
-            {isPending && (
-              <div
-                title="carregando prompts"
-                className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-2"
-              >
-                <Spinner />
-                {/* <span className="text-sm text-neutral-500">Buscando...</span> */}
-              </div>
-            )}
-          </form>
-        </section>
-        {!isCollapsed && (
-          <div>
-            <Button onClick={handleNewPrompt} className="w-full" size="lg">
-              <Plus className="size-5 text-neutral-100 mr-2" />
-              Novo Prompt
-            </Button>
-          </div>
-        )}
-      </Sidebar.Section>
-
-      {/* expand aside */}
-      <Sidebar.SectionExpand
-        aria-label="expand side bar"
-        title="expand side bar"
+    <>
+      <Button
+        data-mobile-open={isMobileOpen}
+        title="Abrir Menu"
+        aria-label="Abrir Menu"
+        aria-expanded={isMobileOpen}
+        variant={'secondary'}
+        className="fixed top-6 left-6 z-40 md:!hidden inline-flex"
+        onClick={openMobileMenu}
       >
-        <Button
-          variant={'sidebar'}
-          aria-label="Expandir menu"
-          title="Expandir menu"
-          onClick={expandSidebar}
-        >
-          <ArrowRightToLine className="size-5 text-neutral-100" />
-        </Button>
-        {isCollapsed && (
-          <div className="group-data-[collapsed=true]:block group-data-[collapsed=false]:hidden flex items-center ">
-            <Button
-              onClick={handleNewPrompt}
-              title="Novo Prompt"
-              aria-label="Novo prompt"
-              className="cursor-pointer"
-            >
-              <Plus className="size-5 text-neutral-100 " />
-            </Button>
-          </div>
-        )}
-      </Sidebar.SectionExpand>
+        <Menu className="size-5 text-neutral-100" />
+      </Button>
 
-      {!isCollapsed && (
-        <Sidebar.SectionNav
-          aria-label="Lista de prompts"
-          title="Lista de prompts"
+      <Sidebar.Root
+        data-collapsed={isCollapsed}
+        data-mobile-open={isMobileOpen}
+      >
+        <Sidebar.Section aria-label="sidebar content" title="sidebar content">
+          {/* menu Hamburg */}
+          <Sidebar.Menu>
+            <div className="flex items-center justify-between">
+              <Button
+                variant={'secondary'}
+                aria-label="Fechar menu"
+                title="Fechar menu"
+                onClick={closeMobileMenu}
+                className="md:hidden"
+              >
+                <X className="size-5 text-neutral-100" />
+              </Button>
+            </div>
+          </Sidebar.Menu>
+
+          <div className="flex w-full items-center justify-between mb-6">
+            {/* closed aside */}
+            <Sidebar.Header>
+              <Logo />
+              <Button
+                variant={'sidebar'}
+                onClick={collapseSidebar}
+                aria-label="Minimizar menu"
+                title="Minimizar menu"
+              >
+                <ArrowLeftToLine className="size-5 text-neutral-100" />
+              </Button>
+            </Sidebar.Header>
+          </div>
+          <section className="mb-5 ">
+            <form
+              ref={formRef}
+              action={setSearchFormState}
+              className="relative group w-full"
+            >
+              <Input
+                type="text"
+                name="q"
+                value={query}
+                placeholder="Buscar prompts..."
+                onChange={handleQueryChange}
+                autoFocus
+              />
+              {isPending && (
+                <div
+                  title="carregando prompts"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-2"
+                >
+                  <Spinner />
+                  {/* <span className="text-sm text-neutral-500">Buscando...</span> */}
+                </div>
+              )}
+            </form>
+          </section>
+          {!isCollapsed && (
+            <div>
+              <Button onClick={handleNewPrompt} className="w-full" size="lg">
+                <Plus className="size-5 text-neutral-100 mr-2" />
+                Novo Prompt
+              </Button>
+            </div>
+          )}
+        </Sidebar.Section>
+
+        {/* expand aside */}
+        <Sidebar.SectionExpand
+          aria-label="expand side bar"
+          title="expand side bar"
         >
-          <PromptList prompts={promptList} />
-        </Sidebar.SectionNav>
-      )}
-    </Sidebar.Root>
+          <Button
+            variant={'sidebar'}
+            aria-label="Expandir menu"
+            title="Expandir menu"
+            onClick={expandSidebar}
+          >
+            <ArrowRightToLine className="size-5 text-neutral-100" />
+          </Button>
+          {isCollapsed && (
+            <div className="flex items-center">
+              <Button
+                onClick={handleNewPrompt}
+                title="Novo Prompt"
+                aria-label="Novo prompt"
+                className="cursor-pointer"
+              >
+                <Plus className="size-5 text-neutral-100 " />
+              </Button>
+            </div>
+          )}
+        </Sidebar.SectionExpand>
+        {!isCollapsed && (
+          <Sidebar.SectionNav
+            aria-label="Lista de prompts"
+            title="Lista de prompts"
+          >
+            <PromptList prompts={promptList} />
+          </Sidebar.SectionNav>
+        )}
+      </Sidebar.Root>
+    </>
   )
 }

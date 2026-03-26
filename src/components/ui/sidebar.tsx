@@ -7,13 +7,15 @@ const SidebarRoot = ({ className, ...props }: SidebarRootProps) => {
     <aside
       {...props}
       className={twMerge(
-        'group',
-        'flex flex-col h-full ease-in-out ',
-        'border border-neutral-700 bg-neutral-800 ',
-        //animacāo de colapsar e expandir
-        'transition-[transform,width] duration-300 ease-[cubic-bezier(0.2,1,0.2,1)]',
+        'group flex flex-col h-full bg-neutral-800 border-r border-neutral-700 ',
+        'transition-[width,transform] duration-300 ease-in-out',
+        // 1. MOBILE (Base)
+        'fixed inset-y-0 left-0 z-50 w-[80vw] sm:w-[320px]',
+        'data-[mobile-open=false]:-translate-x-full data-[mobile-open=true]:translate-x-0',
+
+        // 2. DESKTOP RESET ()
+        'md:!relative md:!inset-auto md:!translate-x-0 md:!z-0 md:flex-shrink-0',
         'data-[collapsed=true]:md:w-16 data-[collapsed=false]:md:w-[384px]',
-        'fixed md:relative left-0 top-0 z-50 md:z-auto w-[80vw] sm:w-[320px]',
         className,
       )}
     />
@@ -25,9 +27,7 @@ const SidebarHeader = ({ className, ...props }: SidebarHeaderProps) => {
   return (
     <header
       className={twMerge(
-        'flex w-full items-center justify-between',
-        // 2. Mantém a largura máxima para o Header não espremer
-        'w-[80vw] sm:w-[320px] md:w-[384px]',
+        'flex items-center justify-between w-full px-6 py-4',
         className,
       )}
       {...props}
@@ -40,9 +40,8 @@ const SidebarMenu = ({ className, ...props }: SidebarMenuProps) => {
   return (
     <div
       className={twMerge(
-        'group-data-[collapsed=true]:hidden  md:hidden mb-4',
-        // Transição de opacidade combinada com 'invisible' (para não ser clicável quando invisível)
-        // 'group-data-[collapsed=true]:opacity-0 group-data-[collapsed=true]:invisible md:hidden',
+        'mb-4 md:hidden block', // block força ele a existir no mobile
+        'group-data-[mobile-open=false]:hidden', // Só some se a sidebar fechar
         className,
       )}
       {...props}

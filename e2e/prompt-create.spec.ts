@@ -16,10 +16,11 @@ test.describe('Prompt Create Page', () => {
 
     await page.goto('/prompts/new')
 
-    await expect(page.getByPlaceholder('Titulo do prompt')).toBeVisible()
+    const titleInput = page.getByPlaceholder('Titulo do prompt')
+    await titleInput.waitFor({ state: 'visible' })
 
-    await page.fill('input[name="title"]', title)
-    await page.fill('textarea[name="content"]', content)
+    await titleInput.fill(title)
+    await page.getByPlaceholder('Digite o conteudo do prompt...').fill(content)
 
     await page.click('button[type="submit"]')
 
