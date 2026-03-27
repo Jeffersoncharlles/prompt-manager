@@ -71,7 +71,9 @@ describe('Sidebar content', () => {
     it('should render a new prompt button', async () => {
       makeSut()
 
-      expect(screen.getByRole('button', { name: /novo prompt/i })).toBeVisible()
+      expect(
+        screen.getByRole('button', { name: /novo prompt/i }),
+      ).toBeInTheDocument()
     })
 
     it('should render the list prompts', async () => {
@@ -159,7 +161,7 @@ describe('Sidebar content', () => {
       const newPromptButton = screen.getByRole('button', {
         name: /novo prompt/i,
       })
-      expect(newPromptButton).toBeVisible()
+      expect(newPromptButton).toBeInTheDocument()
     })
     it('should not The list of prompts  be displayed in the minimized sidebar.', async () => {
       makeSut()

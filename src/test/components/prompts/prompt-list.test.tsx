@@ -5,6 +5,14 @@ import {
 
 import { render, screen } from '@/lib/test-util'
 
+const refreshMock = jest.fn()
+
+jest.mock('next/navigation', () => ({
+  useRouter: () => ({
+    refresh: refreshMock,
+  }),
+}))
+
 const makeSut = ({ prompts }: PromptListProps) => {
   render(<PromptList prompts={prompts} />)
 }
