@@ -6,6 +6,14 @@ import {
 } from '@/components/prompts/prompt-card'
 import { render, screen } from '@/lib/test-util'
 
+const refreshMock = jest.fn()
+
+jest.mock('next/navigation', () => ({
+  useRouter: () => ({
+    refresh: refreshMock,
+  }),
+}))
+
 const makeSut = ({ prompt }: PromptCardProps) => {
   render(<PromptCard prompt={prompt} />)
 }
@@ -63,6 +71,7 @@ describe('PromptCard Component', () => {
     await user.click(screen.getByRole('button', { name: /Confirmar Remoção/i }))
 
     expect(toast.success).toHaveBeenCalledWith('Prompt removido com sucesso.')
+    expect(refreshMock).toHaveBeenCalled()
   })
   it('should handle error and display the toast', async () => {
     deleteMock.mockResolvedValueOnce({
@@ -77,5 +86,6 @@ describe('PromptCard Component', () => {
     await user.click(screen.getByRole('button', { name: /Confirmar Remoção/i }))
 
     expect(toast.error).toHaveBeenCalledWith('Erro ao remover o prompt.')
+    expect(refreshMock).toHaveBeenCalled()
   })
 })

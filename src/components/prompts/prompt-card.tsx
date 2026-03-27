@@ -1,7 +1,9 @@
 'use client'
 
 import { Loader2Icon, Trash } from 'lucide-react'
+import { motion } from 'motion/react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 import { toast } from 'sonner'
 import { deletePromptAction } from '@/app/actions/prompt.actions'
@@ -24,6 +26,7 @@ export type PromptCardProps = {
 }
 
 export const PromptCard = ({ prompt }: PromptCardProps) => {
+  const router = useRouter()
   const [isDeleting, setIsDeleting] = useState(false)
 
   const handleDelete = async () => {
@@ -31,13 +34,25 @@ export const PromptCard = ({ prompt }: PromptCardProps) => {
     try {
       const result = await deletePromptAction(prompt.id)
       result.success ? toast.success(result.msg) : toast.error(result.msg)
+      router.refresh()
     } finally {
       setIsDeleting(false)
     }
   }
 
   return (
-    <li className="p-3 rounded-lg transition-all duration-200 group relative hover:bg-neutral-700 flex justify-between">
+    <motion.li
+      initial={{ opacity: 0, height: 'auto' }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{
+        opacity: 0,
+        height: 0,
+        marginBottom: 0,
+        transition: { duration: 0.2, ease: 'easeInOut' },
+      }}
+      aria-label={prompt.title}
+      className="p-3 rounded-lg transition-all duration-200 group relative hover:bg-neutral-700 flex justify-between"
+    >
       <header className="flex items-start justify-between">
         <Link
           href={`/prompts/${prompt.id}`}
@@ -84,6 +99,6 @@ export const PromptCard = ({ prompt }: PromptCardProps) => {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-    </li>
+    </motion.li>
   )
 }

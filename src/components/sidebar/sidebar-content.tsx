@@ -1,6 +1,7 @@
 'use client'
 
 import { ArrowLeftToLine, ArrowRightToLine, Menu, Plus, X } from 'lucide-react'
+import { motion } from 'motion/react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import {
   startTransition,
@@ -26,6 +27,8 @@ export const SidebarContent = ({ prompts }: SidebarContentProps) => {
   const [isMobileOpen, setIsMobileOpen] = useState(false)
   const formRef = useRef<HTMLFormElement | null>(null)
   const searchParams = useSearchParams()
+  const initialMotion = { opacity: 0 }
+  const fadeTransition = { duration: 0.3, delay: 0.1 }
 
   const [searchFormState, setSearchFormState, isPending] = useActionState(
     searchPromptAction,
@@ -96,7 +99,12 @@ export const SidebarContent = ({ prompts }: SidebarContentProps) => {
             </div>
           </Sidebar.Menu>
 
-          <div className="flex w-full items-center justify-between mb-6">
+          <motion.div
+            className="flex w-full items-center justify-between mb-6"
+            initial={initialMotion}
+            animate={{ opacity: 1 }}
+            transition={fadeTransition}
+          >
             {/* closed aside */}
             <Sidebar.Header>
               <Logo />
@@ -109,7 +117,7 @@ export const SidebarContent = ({ prompts }: SidebarContentProps) => {
                 <ArrowLeftToLine className="size-5 text-neutral-100" />
               </Button>
             </Sidebar.Header>
-          </div>
+          </motion.div>
           <section className="mb-5 ">
             <form
               ref={formRef}
@@ -136,12 +144,17 @@ export const SidebarContent = ({ prompts }: SidebarContentProps) => {
             </form>
           </section>
           {!isCollapsed && (
-            <div>
+            <motion.div
+              initial={initialMotion}
+              animate={{ opacity: 1 }}
+              transition={fadeTransition}
+              exit={{ opacity: 0 }}
+            >
               <Button onClick={handleNewPrompt} className="w-full" size="lg">
                 <Plus className="size-5 text-neutral-100 mr-2" />
                 Novo Prompt
               </Button>
-            </div>
+            </motion.div>
           )}
         </Sidebar.Section>
 
@@ -159,7 +172,12 @@ export const SidebarContent = ({ prompts }: SidebarContentProps) => {
             <ArrowRightToLine className="size-5 text-neutral-100" />
           </Button>
           {isCollapsed && (
-            <div className="flex items-center">
+            <motion.div
+              initial={initialMotion}
+              animate={{ opacity: 1 }}
+              transition={fadeTransition}
+              className="flex items-center"
+            >
               <Button
                 onClick={handleNewPrompt}
                 title="Novo Prompt"
@@ -168,7 +186,7 @@ export const SidebarContent = ({ prompts }: SidebarContentProps) => {
               >
                 <Plus className="size-5 text-neutral-100 " />
               </Button>
-            </div>
+            </motion.div>
           )}
         </Sidebar.SectionExpand>
         {!isCollapsed && (

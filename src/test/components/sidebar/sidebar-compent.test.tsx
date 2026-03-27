@@ -3,14 +3,7 @@ import {
   SidebarContent,
   type SidebarContentProps,
 } from '@/components/sidebar/sidebar-content'
-import { fireEvent, render, screen, waitFor } from '@/lib/test-util'
-
-if (typeof HTMLFormElement.prototype.requestSubmit !== 'function') {
-  HTMLFormElement.prototype.requestSubmit = function () {
-    const event = new Event('submit', { bubbles: true, cancelable: true })
-    this.dispatchEvent(event)
-  }
-}
+import { render, screen, waitFor } from '@/lib/test-util'
 
 const mockedSearchPromptAction = jest.fn().mockResolvedValue({
   success: true,
@@ -52,14 +45,14 @@ const makeSut = (
   render(<SidebarContent prompts={prompts} />)
 }
 
-const expectSidebarState = (isCollapsed: boolean) => {
-  // Sidebar.Root é <aside aria-label="sidebar content">
-  const aside = screen.getByLabelText(/sidebar content/i)
-  expect(aside).toHaveAttribute(
-    'data-collapsed',
-    isCollapsed ? 'true' : 'false',
-  )
-}
+// const expectSidebarState = (isCollapsed: boolean) => {
+//   // Sidebar.Root é <aside aria-label="sidebar content">
+//   const aside = screen.getByLabelText(/sidebar content/i)
+//   expect(aside).toHaveAttribute(
+//     'data-collapsed',
+//     isCollapsed ? 'true' : 'false',
+//   )
+// }
 
 describe('Sidebar content', () => {
   const user = userEvent.setup()
@@ -218,23 +211,15 @@ describe('Sidebar content', () => {
 
     it('should start the search field with the search parameters.', async () => {
       const text = 'prompt1'
-      mockSearchParams = new URLSearchParams(`q=${text}`)
-
+      const url = new URLSearchParams(`q=${text}`)
+      mockSearchParams = url
       makeSut()
 
-      const searchInput =
-        await screen.findByPlaceholderText(/buscar prompts.../i)
-      expect(searchInput).toHaveValue(text)
-
-      // Forçamos o submit caso o useEffect do requestSubmit() falhe no JSDOM
-      const form = searchInput.closest('form')
-      if (form) {
-        fireEvent.submit(form)
-      }
-
+      const searchInput = screen.getByPlaceholderText(/buscar prompts.../i)
       await waitFor(() => {
         expect(mockedSearchPromptAction).toHaveBeenCalled()
       })
+      expect(searchInput).toHaveValue(text)
     })
 
     it('should display original prompts list when no search query is active', async () => {

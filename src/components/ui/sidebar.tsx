@@ -1,14 +1,17 @@
+import { type HTMLMotionProps, motion } from 'motion/react'
 import type { ComponentProps } from 'react'
 import { twMerge } from 'tailwind-merge'
 
-interface SidebarRootProps extends ComponentProps<'aside'> {}
+interface SidebarRootProps extends HTMLMotionProps<'aside'> {}
 const SidebarRoot = ({ className, ...props }: SidebarRootProps) => {
   return (
-    <aside
+    <motion.aside
       {...props}
+      initial={false}
+      transition={{ duration: 0.3, ease: 'easeInOut' }}
       className={twMerge(
         'group flex flex-col h-full bg-neutral-800 border-r border-neutral-700 ',
-        'transition-[width,transform] duration-300 ease-in-out',
+        // 'transition-[width,transform] duration-300 ease-in-out', animaçāo tailwind
         // MOBILE (Base): Fixo e escondido
         'fixed inset-y-0 left-0 z-50 w-[80vw] sm:w-[320px]',
         'data-[mobile-open=false]:-translate-x-full data-[mobile-open=true]:translate-x-0',
