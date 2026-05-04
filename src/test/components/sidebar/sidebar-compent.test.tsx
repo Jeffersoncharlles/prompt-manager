@@ -1,4 +1,6 @@
 import userEvent from '@testing-library/user-event'
+import React from 'react'
+
 import {
   SidebarContent,
   type SidebarContentProps,
@@ -9,6 +11,8 @@ const mockedSearchPromptAction = jest.fn().mockResolvedValue({
   success: true,
   prompts: [],
 })
+
+const setQueryMock = jest.fn()
 
 jest.mock('@/app/actions/prompt.actions', () => ({
   searchPromptAction: (...args: unknown[]) => mockedSearchPromptAction(...args),
@@ -23,6 +27,19 @@ jest.mock('@/lib/prisma', () => ({
   },
 }))
 
+jest.mock('nuqs', () => ({
+  useQueryState: (key: string) => {
+    const [state, setState] = React.useState(mockSearchParams.get(key) || '')
+
+    const setQueryState = (nextValue: string) => {
+      setQueryMock(nextValue)
+      setState(nextValue)
+    }
+
+    return [state, setQueryState] as const
+  },
+}))
+
 const pushMock = jest.fn()
 let mockSearchParams = new URLSearchParams()
 
@@ -30,9 +47,6 @@ jest.mock('next/navigation', () => ({
   useRouter: () => ({
     push: pushMock,
   }),
-  useSearchParams: () => {
-    return mockSearchParams
-  },
 }))
 
 const initialPrompts = [
@@ -44,15 +58,6 @@ const makeSut = (
 ) => {
   render(<SidebarContent prompts={prompts} />)
 }
-
-// const expectSidebarState = (isCollapsed: boolean) => {
-//   // Sidebar.Root é <aside aria-label="sidebar content">
-//   const aside = screen.getByLabelText(/sidebar content/i)
-//   expect(aside).toHaveAttribute(
-//     'data-collapsed',
-//     isCollapsed ? 'true' : 'false',
-//   )
-// }
 
 describe('Sidebar content', () => {
   const user = userEvent.setup()
@@ -192,23 +197,21 @@ describe('Sidebar content', () => {
   describe('Search input', () => {
     it('should navigate using the modified URL when typing and clearing.', async () => {
       makeSut()
+      const inputSearch = 'Prompt 1'
       const searchInput = screen.getByPlaceholderText(/buscar prompts.../i)
 
-      await user.type(searchInput, 'Prompt 1')
+      await user.type(searchInput, inputSearch)
       await waitFor(() => {
         expect(mockedSearchPromptAction).toHaveBeenCalled()
       })
+      expect(setQueryMock).toHaveBeenCalled()
 
-      expect(pushMock).toHaveBeenCalled()
-
-      const lastCall = pushMock.mock.calls.at(-1)
-
-      expect(lastCall?.[0]).toBe('/?q=Prompt%201')
+      const lastCall = setQueryMock.mock.calls.at(-1)
+      expect(lastCall?.[0]).toBe(inputSearch)
 
       await user.clear(searchInput)
-
-      const lastClearCall = pushMock.mock.calls.at(-1)
-      expect(lastClearCall?.[0]).toBe('/')
+      const lastClearCall = setQueryMock.mock.calls.at(-1)
+      expect(lastClearCall?.[0]).toBe('')
     })
 
     it('should start the search field with the search parameters.', async () => {

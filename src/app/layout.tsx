@@ -1,6 +1,8 @@
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
+import { NuqsAdapter } from 'nuqs/adapters/next/app'
 import { Toaster } from '@/components/ui/sonner'
+
 import './globals.css'
 import { SidebarComponent } from '@/components/sidebar-component'
 
@@ -28,13 +30,15 @@ export default function RootLayout({
       <body
         className={`${inter.className} bg-neutral-900 text-white antialiased flex h-screen`}
       >
-        <SidebarComponent />
-        <main className="relative flex-1 overflow-auto min-w-0">
-          <div className="p-4 sm:p-6 md:p-8 max-w-full md:max-w-3xl mx-auto h-full">
-            {children}
-          </div>
-        </main>
-        <Toaster position="top-right" richColors closeButton />
+        <NuqsAdapter>
+          <SidebarComponent />
+          <main className="relative flex-1 overflow-auto min-w-0">
+            <div className="p-4 sm:p-6 md:p-8 max-w-full md:max-w-3xl mx-auto h-full">
+              {children}
+            </div>
+          </main>
+          <Toaster position="top-right" richColors closeButton />
+        </NuqsAdapter>
       </body>
     </html>
   )

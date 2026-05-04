@@ -7,7 +7,6 @@ const SidebarRoot = ({ className, ...props }: SidebarRootProps) => {
   return (
     <motion.aside
       {...props}
-      initial={false}
       transition={{ duration: 0.3, ease: 'easeInOut' }}
       className={twMerge(
         'group flex flex-col h-full bg-neutral-800 border-r border-neutral-700 ',

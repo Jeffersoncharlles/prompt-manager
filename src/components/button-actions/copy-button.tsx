@@ -41,7 +41,7 @@ export const CopyButton = ({ content }: CopyButtonProps) => {
         initial={{ opacity: 0, y: 2 }}
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0, y: -2 }}
-        transition={{ duration: 0.1 }}
+        transition={{ duration: 0.5 }}
       >
         {isCopied ? 'Copiado' : 'Copiar'}
       </motion.span>

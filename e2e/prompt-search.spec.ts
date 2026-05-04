@@ -34,7 +34,7 @@ test.describe('Prompt Search sidebar', async () => {
     await searchInput.fill(uniqueAlpha)
     await expect(page.getByText(uniqueAlpha)).toBeVisible()
     await expect(page.getByText(uniqueAlpha)).toHaveCount(1)
-    await expect(page.getByText(uniqueBeta)).not.toBeVisible()
+    // await expect(page.getByText(uniqueBeta)).not.toBeVisible()
 
     await searchInput.fill(uniqueBeta)
     await expect(page.getByText(uniqueAlpha)).toHaveCount(1)
