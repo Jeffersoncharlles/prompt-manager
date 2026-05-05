@@ -1,5 +1,6 @@
 'use server'
 
+import { revalidatePath } from 'next/cache'
 import z from 'zod'
 import {
   type CreatePromptDto,
@@ -97,6 +98,8 @@ export const createPromptAction = async (
     const useCase = new CreatePromptUseCase(repository)
     await useCase.execute(validated.data)
 
+    revalidatePath('/', 'layout') // Revalida a página inicial e o layout para refletir o novo prompt criado
+
     return {
       success: true,
       msg: 'Prompt criado com sucesso.',
@@ -136,6 +139,8 @@ export const updatePromptAction = async (
     const repository = new PrismaPromptRepository(prisma)
     const useCase = new UpdatePromptUseCase(repository)
     await useCase.execute({ ...validated.data })
+
+    revalidatePath('/', 'layout')
 
     return {
       success: true,
@@ -177,6 +182,8 @@ export const deletePromptAction = async (id: string): Promise<FormState> => {
     const repository = new PrismaPromptRepository(prisma)
     const useCase = new DeletePromptUseCase(repository)
     await useCase.execute({ id })
+    revalidatePath('/', 'layout')
+
     return {
       success: true,
       msg: 'Prompt deletado com sucesso.',
