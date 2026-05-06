@@ -28,11 +28,11 @@ jobs:
       - name: Checkout do Repositório
         uses: actions/checkout@v4
 
-      - name: Configurar Node.js com Cache
+      - name: Configurar Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 22.x
-          cache: pnpm
+
 
       - name: Instalar pnpm
         uses: pnpm/action-setup@v2
