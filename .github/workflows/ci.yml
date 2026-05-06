@@ -41,6 +41,9 @@ jobs:
       - name: Instalar Dependências
         run: pnpm install --frozen-lockfile
 
+      - name: Gerar Cliente do Prisma
+        run: pnpm db:generate
+
       - name: Verificar Estilo (Lint)
         run: pnpm lint
 
