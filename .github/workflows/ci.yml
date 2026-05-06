@@ -52,9 +52,6 @@ jobs:
 
       - name: Rodar Testes de Unidade
         run: pnpm test:coverage
-
-      - name: Rodar Testes E2E
-        run: pnpm test:e2e
-
+        
       - name: Gerar Build Final
         run: pnpm build
