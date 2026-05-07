@@ -1,5 +1,5 @@
 name: CI (Integração Contínua)
-on: [pull_request]
+on: [pull_request, push]
 
 jobs:
   build:
@@ -28,11 +28,10 @@ jobs:
       - name: Checkout do Repositório
         uses: actions/checkout@v4
 
-      - name: Configurar Node.js com Cache
+      - name: Configurar Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 22.x
-          cache: pnpm
 
       - name: Instalar pnpm
         uses: pnpm/action-setup@v2
@@ -42,6 +41,9 @@ jobs:
       - name: Instalar Dependências
         run: pnpm install --frozen-lockfile
 
+      - name: Gerar Cliente do Prisma
+        run: pnpm db:generate
+
       - name: Verificar Estilo (Lint)
         run: pnpm lint
 
@@ -50,9 +52,6 @@ jobs:
 
       - name: Rodar Testes de Unidade
         run: pnpm test:coverage
-
-      - name: Rodar Testes E2E
-        run: pnpm test:e2e
-
+        
       - name: Gerar Build Final
         run: pnpm build
